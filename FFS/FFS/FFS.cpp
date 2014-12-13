@@ -2,7 +2,7 @@
 //
 
 #include "stdafx.h"
-
+#include <boost/asio.hpp>
 
 int _tmain(int argc, _TCHAR* argv[])
 {
