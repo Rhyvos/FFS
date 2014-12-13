@@ -1,22 +1,24 @@
 #ifndef LOBBY_HPP
 #define LOBBY_HPP
-
 #include <boost/asio.hpp>
 #include "Player.hpp"
 
-using namespace std;
 
-class Lobby{
+
+class Lobby : std::enable_shared_from_this<Lobby>{
 	public:
-		Lobby(int port);
+		Lobby(std::string ip, std::string port);
 		void do_accept();
-
-
+		void remove_player(Player *p);
+		void create_game(std::string name, int team_size, int teams);
+		void join_game(Player *p);
+		std::list<std::string> get_games();
 
 	private:
-		list<Player> Players;
+		std::list<Player> Players;
 		boost::shared_ptr<boost::asio::io_service> io_service;
-		int port;
+		std::string port;
+		std::string ip;
 };
 
 
