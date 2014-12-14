@@ -2,8 +2,7 @@
 #define LOBBY_HPP
 #include <boost/asio.hpp>
 #include "Player.hpp"
-
-
+#include <set>
 
 class Lobby : std::enable_shared_from_this<Lobby>{
 	public:
@@ -15,7 +14,7 @@ class Lobby : std::enable_shared_from_this<Lobby>{
 		std::list<std::string> get_games();
 
 	private:
-		std::list<Player> Players;
+		std::set<Player*> Players;
 		boost::shared_ptr<boost::asio::io_service> io_service;
 		std::string port;
 		std::string ip;

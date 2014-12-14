@@ -1,7 +1,6 @@
 #include "Lobby.hpp"
-
 #include <iostream>
-
+using namespace std;
 	Lobby::Lobby(std::string ip, std::string port):
 		io_service(new boost::asio::io_service)
 	{
@@ -29,12 +28,22 @@
 		{
 			socket_ptr socket(new boost::asio::ip::tcp::socket(*io_service));
 			acceptor.accept(*socket);
-			Players.emplace_back(socket);
+			Players.emplace(new Player(socket,this));
 		}
+
+
 		
 
 	}
 
+	void Lobby::remove_player(Player *p){
+		cout<<"Deleting player:"<<p->get_name()<<endl;
+		Players.erase(p);
+	}
+
+	void Lobby::create_game(std::string name, int team_size, int teams){
+		std::cout<<"Creating new game: "<<name<<" Team size: "<<team_size<<" No of teams: "<<teams<<std::endl;
+	}
 
 
 

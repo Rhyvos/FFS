@@ -6,9 +6,16 @@
 #pragma once
 
 #include "targetver.h"
-
+#include "Player.hpp"
+#include "Lobby.hpp"
+#include <iostream>
 #include <stdio.h>
 #include <tchar.h>
+#include <boost/asio.hpp>
+#include <boost\bind.hpp>
+#include <boost\thread.hpp>
+
+
 
 
 

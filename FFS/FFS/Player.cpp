@@ -2,15 +2,21 @@
 #include <iostream>
 #include <boost\bind.hpp>
 #include <boost\thread.hpp>
+#include "Lobby.hpp"
 
-
-	Player::Player(boost::shared_ptr<boost::asio::ip::tcp::socket> socket/*, Lobby l*/):
+	Player::Player(boost::shared_ptr<boost::asio::ip::tcp::socket> socket, Lobby* l):
 		socket(socket)
 	{
-		
+		lobby=l;
 		name="unknown";
 		boost::thread t(&Player::recive,this);
 	}
+	Player::~Player(){
+		socket->close();
+	}
+
+
+
 
 	void Player::recive(){
 		char msg[MAX_MESSAGE_LENGTH];
@@ -29,6 +35,7 @@
 		}
 		catch(std::exception &ec){
 				std::cout<<"["<<name<<"] "<<ec.what()<<std::endl;
+				lobby->remove_player(this);
 		}	
 	}
 
@@ -37,19 +44,26 @@
 		std::cout<<"["<<name<<"] "<<str;
 		std::vector<std::string> split_msg=split(str,".");
 		if(!split_msg[0].compare("name")){
-			std::cout<<"1"<<std::endl;
+			name.erase();
+			name.insert(0,split_msg[1],0,split_msg[1].size()-2);
 		}
 		else if(!split_msg[0].compare("create_game")){
-			std::cout<<"2"<<std::endl;
+			lobby->create_game(split_msg[1],stoi(split_msg[2]),stoi(split_msg[3]));
 		}
 		else if(!split_msg[0].compare("join_game")){
 			std::cout<<"3"<<std::endl;
 		}
-		else if(!split_msg[0].compare("login")){
+		else if(!split_msg[0].compare("leave_game")){
 			std::cout<<"4"<<std::endl;
 		}
-		else if(!split_msg[0].compare("gamelist")){
+		else if(!split_msg[0].compare("login")){
 			std::cout<<"5"<<std::endl;
+		}
+		else if(!split_msg[0].compare("gamelist")){
+			std::cout<<"6"<<std::endl;
+		}
+		else if(!split_msg[0].compare("disconnect")){
+			lobby->remove_player(this);
 		}
 	}
 	
@@ -67,4 +81,8 @@
 		return tmp;
 	}
 
+
+	std::string Player::get_name(){
+		return name;
+	}
 	
