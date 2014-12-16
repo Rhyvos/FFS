@@ -5,13 +5,14 @@
 #include "Lobby.hpp"
 
 	Player::Player(boost::shared_ptr<boost::asio::ip::tcp::socket> socket, Lobby* l):
-		socket(socket)
+		socket(socket), Movement(60)
 	{
 		lobby=l;
 		name="unknown";
 		boost::thread t(&Player::recive,this);
 	}
 	Player::~Player(){
+		std::cout<<"Player destructor";
 		socket->close();
 	}
 
@@ -65,7 +66,18 @@
 		else if(!split_msg[0].compare("disconnect")){
 			lobby->remove_player(this);
 		}
+		else{
+			lobby->send("["+get_name()+"] "+ str);
+		}
 	}
+
+	void Player::send(std::string str){
+		mtx_.lock();
+		socket->send(boost::asio::buffer(str));
+		mtx_.unlock();
+	}
+
+
 	
 
 	std::vector<std::string> Player::split (std::string str, std::string delimiter){

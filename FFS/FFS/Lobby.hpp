@@ -12,7 +12,7 @@ class Lobby : std::enable_shared_from_this<Lobby>{
 		void create_game(std::string name, int team_size, int teams);
 		void join_game(Player *p);
 		std::list<std::string> get_games();
-
+		void send(std::string msg);
 	private:
 		std::set<Player*> Players;
 		boost::shared_ptr<boost::asio::io_service> io_service;

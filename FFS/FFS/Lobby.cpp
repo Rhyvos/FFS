@@ -39,10 +39,18 @@ using namespace std;
 	void Lobby::remove_player(Player *p){
 		cout<<"Deleting player:"<<p->get_name()<<endl;
 		Players.erase(p);
+		delete p;
 	}
 
 	void Lobby::create_game(std::string name, int team_size, int teams){
 		std::cout<<"Creating new game: "<<name<<" Team size: "<<team_size<<" No of teams: "<<teams<<std::endl;
+	}
+
+
+	void Lobby::send(string msg){
+		for(set<Player*>::iterator it=Players.begin(); it!=Players.end() ; it++){
+			(*it)->send(msg);
+		}
 	}
 
 
