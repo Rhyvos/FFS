@@ -6,6 +6,7 @@ using namespace std;
 	{
 		this->ip=ip;
 		this->port=port;
+		game_id=0;
 	}
 
 	typedef boost::shared_ptr<boost::asio::ip::tcp::socket> socket_ptr;
@@ -44,6 +45,8 @@ using namespace std;
 
 	void Lobby::create_game(std::string name, int team_size, int teams){
 		std::cout<<"Creating new game: "<<name<<" Team size: "<<team_size<<" No of teams: "<<teams<<std::endl;
+		Games.emplace(new Game(name,game_id,team_size,teams));
+		game_id++;
 	}
 
 
@@ -51,6 +54,28 @@ using namespace std;
 		for(set<Player*>::iterator it=Players.begin(); it!=Players.end() ; it++){
 			(*it)->send(msg);
 		}
+	}
+
+	std::list<std::string> Lobby::get_games(){
+		std::list<std::string> tmp_list;
+		string s;
+		for (std::set<Game*>::iterator it=Games.begin(); it!=Games.end(); ++it){
+			s=("game_list."+(*it)->get_name()+"."+std::to_string((*it)->players_number())+"."+std::to_string((*it)->max_players())+"\n");
+			tmp_list.emplace_back(s);
+		}
+		return tmp_list;
+	}
+
+
+	Game* Lobby::join_game(Player *p,string name){
+		if(Games.size())
+			for (std::set<Game*>::iterator it=Games.begin(); it!=Games.end();){
+				if(!(*it)->get_name().compare(name)){
+					return (*it);
+				}
+				it++;
+			}		
+		return NULL;
 	}
 
 

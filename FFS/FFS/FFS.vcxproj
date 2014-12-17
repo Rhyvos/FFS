@@ -80,6 +80,7 @@
     <Text Include="ReadMe.txt" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Game.hpp" />
     <ClInclude Include="Lobby.hpp" />
     <ClInclude Include="Movement.hpp" />
     <ClInclude Include="Player.hpp" />
@@ -88,6 +89,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="FFS.cpp" />
+    <ClCompile Include="Game.cpp" />
     <ClCompile Include="Lobby.cpp" />
     <ClCompile Include="Movement.cpp" />
     <ClCompile Include="Player.cpp" />
