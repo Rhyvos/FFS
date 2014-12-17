@@ -20,8 +20,10 @@ class Player : public Movement{
 		std::vector<std::string> split (std::string str,std::string delimiter);
 		std::string get_name();
 		bool in_game;
-
+		void set_team(int i);
+		void end_game();
 	private:
+		int team;
 		boost::shared_ptr<boost::asio::ip::tcp::socket> socket;
 		std::string name;
 		Lobby *lobby;

@@ -11,16 +11,21 @@ class Game{
 
 		void add_player(Player* p);
 		void remove_player(Player* p);
-		void start();
-		void send_msg(std::string msg);
+		void start(int time);
+		void game_end();
+		void send(std::string msg);
 
 		int players_number();
 		int max_players();
 
 		Game* get_game();
+
+		void collisions(Player* p);
 	private:
 		std::set<Player*> Players;
 		void update();
+		void build_map();
+		void start_players();
 		const int id;
 		const std::string name;
 		int team_size; 

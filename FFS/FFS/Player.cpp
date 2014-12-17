@@ -96,7 +96,7 @@ using namespace std;
 				lobby->send("["+get_name()+"] "+ str);
 			}
 			else{
-				game->send_msg("["+get_name()+"] "+ str);
+				game->send("["+get_name()+"] "+ str);
 			}
 		}
 	}
@@ -108,6 +108,28 @@ using namespace std;
 		std::vector<std::string> split_msg=split(str,".");
 		if(!split_msg[0].compare("disconnect")){
 			lobby->remove_player(this);
+		}
+		else if(!split_msg[0].compare("start_move")){
+			boost::thread t(boost::bind(&Movement::start_move,this,stof(split_msg[1].replace(split_msg[1].find(","),1,".",1))));
+			game->send("player."+name+"."+str);
+		}
+		else if(!split_msg[0].compare("jump")){
+			cout<<"jump"<<endl;
+			boost::thread t(boost::bind(&Movement::jump,this,std::stof(split_msg[1].replace(split_msg[1].find(","),1,".",1))));
+			game->send("player."+name+"."+str);
+		}
+		else if(!split_msg[0].compare("stop_move")){
+			boost::thread t(boost::bind(&Movement::stop_move,this));
+			game->send("player."+name+"."+str);
+		}
+		else if(!split_msg[0].compare("shoot")){
+			cout<<"["<<name<<"] action"<<endl;
+		}
+		else if(!split_msg[0].compare("swap_weapon")){
+			cout<<"["<<name<<"] action"<<endl;
+		}
+		else if(!split_msg[0].compare("action")){
+			cout<<"["<<name<<"] action"<<endl;
 		}
 		else{
 			lobby->send("["+get_name()+"] "+ str);
@@ -152,3 +174,11 @@ using namespace std;
 		return name;
 	}
 	
+	void Player::set_team(int i){
+		team=i;
+	}
+
+	void Player::end_game(){
+		in_game=false;
+		game=NULL;
+	}

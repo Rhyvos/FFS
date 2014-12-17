@@ -32,9 +32,6 @@ using namespace std;
 			Players.emplace(new Player(socket,this));
 		}
 
-
-		
-
 	}
 
 	void Lobby::remove_player(Player *p){

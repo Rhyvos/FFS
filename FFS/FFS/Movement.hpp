@@ -6,7 +6,8 @@ class Movement{
 		Movement(int FPS);
 		void start_move(float accelerartion);
 		void stop_move();
-		void instant_stop();
+		void instant_stop_x();
+		void instant_stop_y();
 		void jump(float vy);
 		float get_x();
 		float get_y();

@@ -1,6 +1,6 @@
 #include <boost/thread.hpp>		
 #include "Movement.hpp"
-
+#include <iostream>
 
 		Movement::Movement(int FPS):
 		GRAVITATION(-250),
@@ -26,9 +26,13 @@
 			ax=0;
 		}
 
-		void Movement::instant_stop(){
+		void Movement::instant_stop_x(){
 			vx=0;
+			ax=0;
+		}
+		void Movement::instant_stop_y(){
 			vy=0;
+			ay=0;
 		}
 
 		void Movement::jump(float vy){
