@@ -13,6 +13,7 @@ using namespace std;
 		name="unknown";
 		boost::thread t(&Player::recive,this);
 		in_game=false;
+		game=NULL;
 	}
 	Player::~Player(){
 		if(game!=NULL)
@@ -26,7 +27,6 @@ using namespace std;
 	void Player::recive(){
 		char msg[MAX_MESSAGE_LENGTH];
 		size_t length;
-		std::cout<<"waiting for message from: "<<name<<std::endl;
 		try
 		{
 			while (true)
@@ -50,7 +50,6 @@ using namespace std;
 
 	void Player::handle_lobby_recive(char *msg,std::size_t bytes_transferred){
 		std::string str(msg,bytes_transferred);
-		std::cout<<"["<<name<<"] "<<str;
 		std::vector<std::string> split_msg=split(str,".");
 		if(!split_msg[0].compare("name")){
 			name.erase();
@@ -61,9 +60,11 @@ using namespace std;
 		}
 		else if(!split_msg[0].compare("join_game")){
 			Game* g=lobby->join_game(this,split_msg[1]);
-
+			if(game!=NULL){
+				game->remove_player(this);
+				game=NULL;
+			}
 			if(g!=NULL){
-				cout<<"adding game"<<endl;
 				game=g;
 				game->add_player(this);
 			}
@@ -82,11 +83,8 @@ using namespace std;
 			std::cout<<"Login function (not scripted)\n"<<std::endl;
 		}
 		else if(!split_msg[0].compare("gamelist")){
-			
 			std::list<std::string> tmp=lobby->get_games();
-			std::cout<<"gamelist "<<tmp.size()<<std::endl;
 			for (std::list<std::string>::iterator it=tmp.begin(); it!=tmp.end(); ++it){
-				std::cout<<"send "<<(*it)<<std::endl;
 				this->send((*it));
 			}
 		}
@@ -94,10 +92,12 @@ using namespace std;
 			lobby->remove_player(this);
 		}
 		else{
-			if(game==NULL)
+			if(game==NULL){
 				lobby->send("["+get_name()+"] "+ str);
-			else
+			}
+			else{
 				game->send_msg("["+get_name()+"] "+ str);
+			}
 		}
 	}
 
@@ -105,7 +105,6 @@ using namespace std;
 
 	void Player::handle_game_recive(char *msg,std::size_t bytes_transferred){
 		std::string str(msg,bytes_transferred);
-		std::cout<<"["<<name<<"] "<<str;
 		std::vector<std::string> split_msg=split(str,".");
 		if(!split_msg[0].compare("disconnect")){
 			lobby->remove_player(this);
@@ -121,7 +120,6 @@ using namespace std;
 	void Player::send(std::string str){
 		mtx_.lock();
 		try{
-			std::cout<<"send() "<<str<<std::endl;
 			socket->send(boost::asio::buffer(str));
 		}
 		catch(std::exception &ec){
