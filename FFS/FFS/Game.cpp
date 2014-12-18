@@ -1,13 +1,19 @@
 #include "Game.hpp"
 #include <iostream>
 #include <boost/thread.hpp>
+#include "Lobby.hpp"
+#include "Player.hpp"
 using namespace std;
 
-		Game::Game(std::string name,int id,int team_size, int teams):
-		id(id), name(name)
+		Game::Game(std::string name,int id,int team_size, int teams, Lobby* l):
+		id(id), name(name), lobby(l)
 		{
 			this->team_size=team_size;
 			this->teams=teams;
+		}
+		Game::~Game(){
+			Players.clear();
+
 		}
 
 		std::string Game::get_name(){
@@ -52,6 +58,7 @@ using namespace std;
 
 			send("game.end\n");
 			game_end();
+			lobby->remove_game(this);
 		}
 
 		void Game::send(std::string msg){
@@ -83,7 +90,7 @@ using namespace std;
 				}
 				
 			}
-
+			
 		}
 
 		void Game::build_map(){

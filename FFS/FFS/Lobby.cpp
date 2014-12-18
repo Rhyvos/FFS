@@ -42,7 +42,7 @@ using namespace std;
 
 	void Lobby::create_game(std::string name, int team_size, int teams){
 		std::cout<<"Creating new game: "<<name<<" Team size: "<<team_size<<" No of teams: "<<teams<<std::endl;
-		Games.emplace(new Game(name,game_id,team_size,teams));
+		Games.emplace(new Game(name,game_id,team_size,teams,this));
 		game_id++;
 	}
 
@@ -76,7 +76,11 @@ using namespace std;
 	}
 
 
-
+	void Lobby::remove_game(Game* g){
+		cout<<"Deleting game:"<<g->get_name()<<endl;
+		Games.erase(g);
+		delete g;
+	}
 
 
 

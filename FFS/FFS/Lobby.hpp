@@ -14,6 +14,7 @@ class Lobby : std::enable_shared_from_this<Lobby>{
 		Game* join_game(Player *p, std::string name);
 		std::list<std::string> get_games();
 		void send(std::string msg);
+		void remove_game(Game* g);
 	private:
 		std::set<Game*> Games;
 		std::set<Player*> Players;

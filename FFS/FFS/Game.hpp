@@ -3,9 +3,12 @@
 #include <iostream>
 #include "Player.hpp"
 #include <set>
+
+class Lobby;
+
 class Game{
 	public:
-		Game(std::string name,int id,int team_size, int teams);
+		Game(std::string name,int id,int team_size, int teams, Lobby* l);
 		~Game();
 		std::string get_name();
 
@@ -22,6 +25,7 @@ class Game{
 
 		void collisions(Player* p);
 	private:
+		Lobby* lobby;
 		std::set<Player*> Players;
 		void update();
 		void build_map();
