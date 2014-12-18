@@ -79,7 +79,7 @@ using namespace std;
 				for(int j=0 ; it!=Players.end() && j<teams ; j++, it++){
 					(*it)->in_game=true;
 					(*it)->set_team(j);
-					send("player."+(*it)->get_name()+".team."+to_string(j));
+					send("player."+(*it)->get_name()+".team."+to_string(j)+"\n");
 				}
 				
 			}
