@@ -23,27 +23,27 @@ using namespace std;
 		void Game::add_player(Player* p){
 			if(Players.size()<team_size*teams){
 				Players.insert(p);
-				send(p->get_name()+".join_game."+std::to_string(id)+"."+name+"\n");
+				send("player,join_game,"+p->get_name()+","+std::to_string(id)+","+name);
 				if(Players.size()==max_players())
 					boost::thread t(boost::bind(&Game::start,this,1800));
 			}
 			else{
-				p->send("error.Game is full\n");
+				p->send("error,Game is full");
 			}
 		}
 
 		void Game::remove_player(Player* p){
 			Players.erase(p);
-			send(p->get_name()+".leave_game."+std::to_string(id)+"."+name+"\n");
+			send("leave_game,"+p->get_name()+","+std::to_string(id)+","+name);
 		}
 
 		void Game::start(int time){
 			for(int i=0;i<10;i++){
-				send("game.start."+to_string(10-i)+"\n");
+				send("game,start,"+to_string(10-i));
 				boost::this_thread::sleep(boost::posix_time::milliseconds(1000));
 			}
 			if(Players.size()!=max_players()){
-				send("game.stop\n");
+				send("game,stop");
 				return;
 			}
 
@@ -56,7 +56,7 @@ using namespace std;
 				time--;
 			}
 
-			send("game.end\n");
+			send("game,end");
 			game_end();
 			lobby->remove_game(this);
 		}
@@ -86,7 +86,10 @@ using namespace std;
 				for(int j=0 ; it!=Players.end() && j<teams ; j++, it++){
 					(*it)->in_game=true;
 					(*it)->set_team(j);
-					send("player."+(*it)->get_name()+".team."+to_string(j)+"\n");
+					(*it)->reset();
+					(*it)->move_to(rand()%100,rand()%100);
+					this->send("player,"+(*it)->get_name()+",move_to,"+(*it)->get_string_x()+","+(*it)->get_string_y());
+					send("player,"+(*it)->get_name()+",team,"+to_string(j));
 				}
 				
 			}
@@ -114,7 +117,7 @@ using namespace std;
 				if(x>100)
 					p->move_to(100,p->get_y());
 
-				send("player."+p->get_name()+".instant_stop_x\n");
+				send("player,"+p->get_name()+",instant_stop_x,"+p->get_string_x()+","+p->get_string_y());
 			}
 			if(y<0||y>100){
 				p->instant_stop_y();
@@ -122,7 +125,7 @@ using namespace std;
 					p->move_to(p->get_x(),0);
 				if(y>100)
 					p->move_to(p->get_x(),100);
-				send("player."+p->get_name()+".instant_stop_y\n");
+				send("player,"+p->get_name()+",instant_stop_y,"+p->get_string_x()+","+p->get_string_y());
 			}
 
 		}

@@ -22,6 +22,7 @@ class Player : public Movement{
 		bool in_game;
 		void set_team(int i);
 		void end_game();
+		void login(std::string name, std::string pw);
 	private:
 		int team;
 		boost::shared_ptr<boost::asio::ip::tcp::socket> socket;
@@ -29,6 +30,7 @@ class Player : public Movement{
 		Lobby *lobby;
 		Game *game;
 		boost::mutex mtx_;
+		bool logged;
 		
 };
 

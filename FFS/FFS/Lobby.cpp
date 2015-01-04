@@ -57,7 +57,7 @@ using namespace std;
 		std::list<std::string> tmp_list;
 		string s;
 		for (std::set<Game*>::iterator it=Games.begin(); it!=Games.end(); ++it){
-			s=("game_list."+(*it)->get_name()+"."+std::to_string((*it)->players_number())+"."+std::to_string((*it)->max_players())+"\n");
+			s=("game_list,"+(*it)->get_name()+","+std::to_string((*it)->players_number())+","+std::to_string((*it)->max_players()));
 			tmp_list.emplace_back(s);
 		}
 		return tmp_list;

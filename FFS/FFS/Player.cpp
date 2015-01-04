@@ -14,6 +14,7 @@ using namespace std;
 		boost::thread t(&Player::recive,this);
 		in_game=false;
 		game=NULL;
+		logged=false;
 	}
 	Player::~Player(){
 		if(game!=NULL)
@@ -50,8 +51,15 @@ using namespace std;
 
 	void Player::handle_lobby_recive(char *msg,std::size_t bytes_transferred){
 		std::string str(msg,bytes_transferred);
-		std::vector<std::string> split_msg=split(str,".");
-		if(!split_msg[0].compare("name")){
+		std::vector<std::string> split_msg=split(str,",");
+		str=str.substr(0,str.size()-2);
+
+		if(!logged){
+			if(!split_msg[0].compare("login"))
+				login(split_msg[1],split_msg[2]);
+
+
+		}else if(!split_msg[0].compare("name")){
 			name.erase();
 			name.insert(0,split_msg[1],0,split_msg[1].size());
 		}
@@ -69,7 +77,7 @@ using namespace std;
 				game->add_player(this);
 			}
 			else
-				send("error.couldn't find game:"+split_msg[1]+"\n");
+				send("error,couldn't find game:"+split_msg[1]+"");
 		}
 		else if(!split_msg[0].compare("leave_game")){
 			if(game!=NULL){
@@ -77,10 +85,7 @@ using namespace std;
 				game=NULL;
 			}	
 			else
-				send("error.no game\n");
-		}
-		else if(!split_msg[0].compare("login")){
-			std::cout<<"Login function (not scripted)\n"<<std::endl;
+				send("error,no game");
 		}
 		else if(!split_msg[0].compare("gamelist")){
 			std::list<std::string> tmp=lobby->get_games();
@@ -105,34 +110,37 @@ using namespace std;
 
 	void Player::handle_game_recive(char *msg,std::size_t bytes_transferred){
 		std::string str(msg,bytes_transferred);
-		std::vector<std::string> split_msg=split(str,".");
+		std::vector<std::string> split_msg=split(str,",");
+		str=str.substr(0,str.size()-2);
+
+
 		if(!split_msg[0].compare("disconnect")){
 			lobby->remove_player(this);
 		}
 		else if(!split_msg[0].compare("start_move")){
-			boost::thread t(boost::bind(&Movement::start_move,this,stof(split_msg[1].replace(split_msg[1].find(","),1,".",1))));
-			game->send("player."+name+"."+str);
+			boost::thread t(boost::bind(&Movement::start_move,this,stof(split_msg[1])));
+			game->send("player,"+name+","+str+","+this->get_string_x()+","+this->get_string_y());
 		}
 		else if(!split_msg[0].compare("jump")){
 			cout<<"jump"<<endl;
-			boost::thread t(boost::bind(&Movement::jump,this,std::stof(split_msg[1].replace(split_msg[1].find(","),1,".",1))));
-			game->send("player."+name+"."+str);
+			boost::thread t(boost::bind(&Movement::jump,this,stof(split_msg[1])));
+			game->send("player,"+name+","+str+","+this->get_string_x()+","+this->get_string_y());
 		}
 		else if(!split_msg[0].compare("stop_move")){
 			boost::thread t(boost::bind(&Movement::stop_move,this));
-			game->send("player."+name+"."+str);
+			game->send("player,"+name+","+str+","+this->get_string_x()+","+this->get_string_y());
 		}
-		else if(!split_msg[0].compare("shoot")){
+		else if(!split_msg[0].compare("shoot")){			/*       No Scripted       */
 			cout<<"["<<name<<"] action"<<endl;
 		}
-		else if(!split_msg[0].compare("swap_weapon")){
+		else if(!split_msg[0].compare("swap_weapon")){		/*       No Scripted       */
 			cout<<"["<<name<<"] action"<<endl;
 		}
-		else if(!split_msg[0].compare("action")){
+		else if(!split_msg[0].compare("action")){			/*       No Scripted       */
 			cout<<"["<<name<<"] action"<<endl;
 		}
 		else{
-			lobby->send("["+get_name()+"] "+ str);
+			lobby->send("["+get_name()+"] "+ str);	
 		}
 	}
 
@@ -142,7 +150,7 @@ using namespace std;
 	void Player::send(std::string str){
 		mtx_.lock();
 		try{
-			socket->send(boost::asio::buffer(str));
+			socket->send(boost::asio::buffer(str+"\n"));
 		}
 		catch(std::exception &ec){
 				std::cout<<"["<<name<<"] "<<ec.what()<<std::endl;
@@ -181,4 +189,13 @@ using namespace std;
 	void Player::end_game(){
 		in_game=false;
 		game=NULL;
+	}
+
+	void Player::login(string name,string pw){
+		/*       No Scripted       */
+		cout<<name<<" "<<pw<<endl;
+		this->name.erase();
+		this->name.insert(0,name,0,name.size());
+		this->logged=true;
+		
 	}
