@@ -25,7 +25,7 @@ using namespace std;
 				Players.insert(p);
 				send("player,join_game,"+p->get_name()+","+std::to_string(id)+","+name);
 				if(Players.size()==max_players())
-					boost::thread t(boost::bind(&Game::start,this,1800));
+					boost::thread t(boost::bind(&Game::start,this,7200));
 			}
 			else{
 				p->send("error,Game is full");
@@ -103,10 +103,19 @@ using namespace std;
 			for(set<Player*>::iterator it=Players.begin(); it!=Players.end() ; it++){
 				collisions(*it);
 				(*it)->update();
-				cout<<"["<<(*it)->get_name()<<"] x:"<<(*it)->get_x()<<" y:"<<(*it)->get_y()<<endl;
+			}
+			for(list<Projectile*>::iterator it=Projectiles.begin(); it!=Projectiles.end() ; it++){
+				if((*it)->is_alive()){
+					(*it)->update();
+					cout<<"bullet x:"<<(*it)->get_x()<<" y:"<<(*it)->get_y()<<endl;
+				}
+
+				
 			}
 		}
-
+float iloczyn(float x1, float y1, float x2,float y2, float x3, float y3) { 
+			return (x2 - x1)*(y3 - y1) - (x3 - x1)*(y2 - y1);    //zwracamy iloczyn skalarny wektorów (p2-p1) i (p3-p1)
+		}
 		void Game::collisions(Player* p){
 			float x=p->get_next_x();
 			float y=p->get_next_y();
@@ -128,10 +137,29 @@ using namespace std;
 				send("player,"+p->get_name()+",instant_stop_y,"+p->get_string_x()+","+p->get_string_y());
 			}
 
+			for(list<Projectile*>::iterator it=Projectiles.begin(); it!=Projectiles.end(); it++){
+				float S_1 = iloczyn((*it)->get_x(),(*it)->get_y(), p->get_x(), p->get_y() , (*it)->get_next_x(),(*it)->get_next_y());
+				float S_2 = iloczyn((*it)->get_x(),(*it)->get_y(), p->get_x(), p->get_y()+75, (*it)->get_next_x(),(*it)->get_next_y());
+				float S_3 = iloczyn(p->get_x(), p->get_y() , (*it)->get_x(),(*it)->get_y(), p->get_x(), p->get_y()+75);
+				float S_4 = iloczyn(p->get_x(), p->get_y() , (*it)->get_x(),p->get_y()+75, p->get_x(), p->get_y()+75);
+				if (((S_1 > 0 && S_2 < 0) || (S_1 < 0 && S_2 > 0)) && ((S_3 < 0 && S_4 > 0) || (S_3 > 0 && S_4 < 0))){
+					send("player,"+p->get_name()+",hp,"+to_string((*it)->get_dmg(1)));
+				}
+			}
+
+
+
+
 		}
+
+		
 
 		void Game::game_end(){
 			for(set<Player*>::iterator it=Players.begin(); it!=Players.end()  ; it++){
 				(*it)->end_game();
 			}
+		}
+
+		void Game::add_projectile(Projectile *p){
+			Projectiles.push_back(p);
 		}

@@ -1,6 +1,6 @@
 #ifndef MOVEMENT_HPP
 #define MOVEMENT_HPP	
-		
+#include <iostream>
 class Movement{
 	public:
 		Movement(int FPS);
@@ -17,17 +17,18 @@ class Movement{
 		float get_next_y();
 		float get_vx();
 		float get_vy();
-		void update();
+		virtual void update();
 		void reset();
 		void move_to(float x, float y);
 
-	private:
+	protected:
 		float x,y;
 		float vx,vy;
-		float maximum_vx,maximum_vy;
 		float ax,ay;
-		const float GRAVITATION;
 		const int LOOP_PER_SECOND;
+		float maximum_vx,maximum_vy;
+		const float GRAVITATION;
+		
 };
 
 

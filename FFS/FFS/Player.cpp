@@ -3,7 +3,7 @@
 #include <boost\bind.hpp>
 #include <boost\thread.hpp>
 #include "Lobby.hpp"
-
+#include "Bullet.hpp"
 using namespace std;
 
 	Player::Player(boost::shared_ptr<boost::asio::ip::tcp::socket> socket, Lobby* l):
@@ -131,7 +131,8 @@ using namespace std;
 			game->send("player,"+name+","+str+","+this->get_string_x()+","+this->get_string_y());
 		}
 		else if(!split_msg[0].compare("shoot")){			/*       No Scripted       */
-			cout<<"["<<name<<"] action"<<endl;
+			game->add_projectile(new Bullet(this->get_x(), this->get_y(),stof(split_msg[1]), this->team ));
+			game->send("player,"+name+",shoot,"+this->get_string_x()+","+this->get_string_y()+","+split_msg[1]);
 		}
 		else if(!split_msg[0].compare("swap_weapon")){		/*       No Scripted       */
 			cout<<"["<<name<<"] action"<<endl;

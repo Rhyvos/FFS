@@ -3,7 +3,7 @@
 #include <iostream>
 #include "Player.hpp"
 #include <set>
-
+#include "Projectile.hpp"
 class Lobby;
 
 class Game{
@@ -24,9 +24,13 @@ class Game{
 		Game* get_game();
 
 		void collisions(Player* p);
+		void add_projectile(Projectile* p);
+
+
 	private:
 		Lobby* lobby;
 		std::set<Player*> Players;
+		std::list<Projectile*> Projectiles;
 		void update();
 		void build_map();
 		void start_players();
