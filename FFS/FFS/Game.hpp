@@ -1,8 +1,6 @@
 #ifndef GAME_H	
 #define GAME_H
-#include <iostream>
 #include "Player.hpp"
-#include <set>
 #include "Projectile.hpp"
 class Lobby;
 

@@ -1,12 +1,10 @@
 #include "Player.hpp"
-#include <iostream>
-#include <boost\bind.hpp>
-#include <boost\thread.hpp>
 #include "Lobby.hpp"
 #include "Bullet.hpp"
+
 using namespace std;
 
-	Player::Player(boost::shared_ptr<boost::asio::ip::tcp::socket> socket, Lobby* l):
+	Player::Player(boost::shared_ptr<boost::asio::ip::tcp::socket> socket, Lobby* l, int id):
 		socket(socket), Movement(60)
 	{
 		lobby=l;
@@ -15,6 +13,7 @@ using namespace std;
 		in_game=false;
 		game=NULL;
 		logged=false;
+		this->id=id;
 	}
 	Player::~Player(){
 		if(game!=NULL)
@@ -52,8 +51,8 @@ using namespace std;
 	void Player::handle_lobby_recive(char *msg,std::size_t bytes_transferred){
 		std::string str(msg,bytes_transferred);
 		std::vector<std::string> split_msg=split(str,",");
-		str=str.substr(0,str.size()-2);
-
+		str=str.substr(0,str.size()-1);
+		cout<<str<<endl;
 		if(!logged){
 			if(!split_msg[0].compare("login"))
 				login(split_msg[1],split_msg[2]);
@@ -72,12 +71,12 @@ using namespace std;
 				game->remove_player(this);
 				game=NULL;
 			}
-			if(g!=NULL){
+			if(g!=NULL&&g->players_number()<g->max_players()){
 				game=g;
 				game->add_player(this);
 			}
 			else
-				send("error,couldn't find game:"+split_msg[1]+"");
+				send("error,couldn't find game:"+split_msg[1]+" or game is full");
 		}
 		else if(!split_msg[0].compare("leave_game")){
 			if(game!=NULL){
@@ -111,28 +110,28 @@ using namespace std;
 	void Player::handle_game_recive(char *msg,std::size_t bytes_transferred){
 		std::string str(msg,bytes_transferred);
 		std::vector<std::string> split_msg=split(str,",");
-		str=str.substr(0,str.size()-2);
-
+		str=str.substr(0,str.size()-1);
+		cout<<str<<endl;
 
 		if(!split_msg[0].compare("disconnect")){
 			lobby->remove_player(this);
 		}
 		else if(!split_msg[0].compare("start_move")){
 			boost::thread t(boost::bind(&Movement::start_move,this,stof(split_msg[1])));
-			game->send("player,"+name+","+str+","+this->get_string_x()+","+this->get_string_y());
+			game->send("player,"+to_string(id)+","+split_msg[0]+","+split_msg[1]+","+this->get_string_x()+","+this->get_string_y());
 		}
 		else if(!split_msg[0].compare("jump")){
 			cout<<"jump"<<endl;
 			boost::thread t(boost::bind(&Movement::jump,this,stof(split_msg[1])));
-			game->send("player,"+name+","+str+","+this->get_string_x()+","+this->get_string_y());
+			game->send("player,"+to_string(id)+","+split_msg[0]+","+split_msg[1]+","+this->get_string_x()+","+this->get_string_y());
 		}
 		else if(!split_msg[0].compare("stop_move")){
 			boost::thread t(boost::bind(&Movement::stop_move,this));
-			game->send("player,"+name+","+str+","+this->get_string_x()+","+this->get_string_y());
+			game->send("player,"+to_string(id)+","+split_msg[0]+","+split_msg[1]+","+this->get_string_x()+","+this->get_string_y());
 		}
 		else if(!split_msg[0].compare("shoot")){			/*       No Scripted       */
 			game->add_projectile(new Bullet(this->get_x(), this->get_y(),stof(split_msg[1]), this->team ));
-			game->send("player,"+name+",shoot,"+this->get_string_x()+","+this->get_string_y()+","+split_msg[1]);
+			game->send("player,"+to_string(id)+",shoot,"+this->get_string_x()+","+this->get_string_y()+","+split_msg[1]);
 		}
 		else if(!split_msg[0].compare("swap_weapon")){		/*       No Scripted       */
 			cout<<"["<<name<<"] action"<<endl;
@@ -150,6 +149,7 @@ using namespace std;
 
 	void Player::send(std::string str){
 		mtx_.lock();
+		cout<<str<<endl;
 		try{
 			socket->send(boost::asio::buffer(str+"\n"));
 		}
@@ -158,6 +158,7 @@ using namespace std;
 				boost::this_thread::sleep(boost::posix_time::milliseconds(300));
 				lobby->remove_player(this);
 		}
+		boost::this_thread::sleep(boost::posix_time::milliseconds(1));
 		mtx_.unlock();
 	}
 
@@ -174,7 +175,7 @@ using namespace std;
 			str.erase(0, pos + delimiter.length());
 		}
 		
-		tmp.push_back(str.substr(0,str.size()-2));
+		tmp.push_back(str.substr(0,str.size()-1));
 		return tmp;
 	}
 
@@ -199,4 +200,8 @@ using namespace std;
 		this->name.insert(0,name,0,name.size());
 		this->logged=true;
 		
+	}
+
+	string Player::get_id(){
+		return to_string(id);
 	}

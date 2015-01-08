@@ -1,12 +1,12 @@
 // FFS.cpp : Defines the entry point for the console application.
 //
 
-#include "stdafx.h"
-#include <boost/asio.hpp>
-#include "Lobby.hpp"
-#include <boost\thread.hpp>
 
-int _tmain(int argc, _TCHAR* argv[])
+
+#include "Lobby.hpp"
+
+
+int main()
 {
 	try{
 	Lobby lobby("127.0.0.1","4444");

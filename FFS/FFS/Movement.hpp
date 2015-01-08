@@ -1,6 +1,7 @@
 #ifndef MOVEMENT_HPP
 #define MOVEMENT_HPP	
-#include <iostream>
+#include "Headers.h"
+
 class Movement{
 	public:
 		Movement(int FPS);
@@ -22,6 +23,7 @@ class Movement{
 		void move_to(float x, float y);
 
 	protected:
+		bool stop;
 		float x,y;
 		float vx,vy;
 		float ax,ay;

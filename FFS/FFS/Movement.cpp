@@ -1,29 +1,31 @@
-#include <boost/thread.hpp>		
+	
 #include "Movement.hpp"
-#include <iostream>
+
 
 		Movement::Movement(int FPS):
 		GRAVITATION(-250),
 		LOOP_PER_SECOND(FPS)
 		{
+			stop=false;
 			x=0.0;
 			y=0.0;
 			vx=0;
 			vy=0;
 			ax=0;
 			ay=0;
-			maximum_vx=60;
-			maximum_vy=60;
+			maximum_vx=120;
+			maximum_vy=120;
 		}
 
 		void Movement::start_move(float accelerartion){
 			ax=accelerartion;
+			stop=false;
 		}
 
 		void Movement::stop_move(){
-			vx=0;
-			ax=0;
-			
+
+			ax=-vx;
+			stop=true;
 
 			
 		}
@@ -33,8 +35,14 @@
 			ax=0;
 		}
 		void Movement::instant_stop_y(){
-			vy=0;
-			ay=0;
+			if(vy<0){
+				vy=0;
+				ay=0;
+			}
+			else{	
+				vy=0;
+				ay=GRAVITATION;
+			}
 		}
 
 		void Movement::jump(float vy){
@@ -72,10 +80,20 @@
 				vx=maximum_vx;
 				ax=0;
 			}
+			if(vx+ax<-maximum_vx){
+				vx=-maximum_vx;
+				ax=0;
+			}
 
 			if(vy+ay>maximum_vy){
 				vy=maximum_vy;
 				ay=0;
+			}
+
+			if(stop==true&&vx*ax>=0){
+				vx=0;
+				ax=0;
+				stop=false;
 			}
 			vx+=ax/LOOP_PER_SECOND;
 			vy+=ay/LOOP_PER_SECOND;
@@ -103,7 +121,7 @@
 			vy=0;
 			ax=0;
 			ay=0;
-			maximum_vx=60;
-			maximum_vy=60;
+			maximum_vx=120;
+			maximum_vy=120;
 		}
 

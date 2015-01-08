@@ -14,9 +14,10 @@
 #include <boost/asio.hpp>
 #include <boost\bind.hpp>
 #include <boost\thread.hpp>
-
-
-
+#include <allegro5\allegro.h>
+#include <math.h>
+#include <set>
+#include <boost/thread/mutex.hpp>
 
 
 // TODO: reference additional headers your program requires here

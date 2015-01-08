@@ -1,9 +1,9 @@
 #ifndef LOBBY_HPP
 #define LOBBY_HPP
-#include <boost/asio.hpp>
+
 #include "Player.hpp"
 #include "Game.hpp"
-#include <set>
+
 
 class Lobby : std::enable_shared_from_this<Lobby>{
 	public:
