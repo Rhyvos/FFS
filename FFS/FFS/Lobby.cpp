@@ -1,11 +1,12 @@
 #include "Lobby.hpp"
-#include <iostream>
+
 using namespace std;
 	Lobby::Lobby(std::string ip, std::string port):
 		io_service(new boost::asio::io_service)
 	{
 		this->ip=ip;
 		this->port=port;
+		game_id=0;
 	}
 
 	typedef boost::shared_ptr<boost::asio::ip::tcp::socket> socket_ptr;
@@ -28,11 +29,8 @@ using namespace std;
 		{
 			socket_ptr socket(new boost::asio::ip::tcp::socket(*io_service));
 			acceptor.accept(*socket);
-			Players.emplace(new Player(socket,this));
+			Players.emplace(new Player(socket,this,i++));
 		}
-
-
-		
 
 	}
 
@@ -44,6 +42,8 @@ using namespace std;
 
 	void Lobby::create_game(std::string name, int team_size, int teams){
 		std::cout<<"Creating new game: "<<name<<" Team size: "<<team_size<<" No of teams: "<<teams<<std::endl;
+		Games.emplace(new Game(name,game_id,team_size,teams,this));
+		game_id++;
 	}
 
 
@@ -53,8 +53,34 @@ using namespace std;
 		}
 	}
 
+	std::list<std::string> Lobby::get_games(){
+		std::list<std::string> tmp_list;
+		string s;
+		for (std::set<Game*>::iterator it=Games.begin(); it!=Games.end(); ++it){
+			s=("game,game_list,"+(*it)->get_name()+","+std::to_string((*it)->players_number())+","+std::to_string((*it)->max_players()));
+			tmp_list.emplace_back(s);
+		}
+		return tmp_list;
+	}
 
 
+	Game* Lobby::join_game(Player *p,string name){
+		if(Games.size())
+			for (std::set<Game*>::iterator it=Games.begin(); it!=Games.end();){
+				if(!(*it)->get_name().compare(name)){
+					return (*it);
+				}
+				it++;
+			}		
+		return NULL;
+	}
+
+
+	void Lobby::remove_game(Game* g){
+		cout<<"Deleting game:"<<g->get_name()<<endl;
+		Games.erase(g);
+		delete g;
+	}
 
 
 
