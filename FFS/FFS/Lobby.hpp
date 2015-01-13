@@ -8,6 +8,7 @@
 class Lobby : std::enable_shared_from_this<Lobby>{
 	public:
 		Lobby(std::string ip, std::string port);
+		~Lobby();
 		void do_accept();
 		void remove_player(Player *p);
 		void create_game(std::string name, int team_size, int teams);

@@ -24,6 +24,7 @@ class Player : public Movement{
 		void end_game();
 		void login(std::string name, std::string pw);
 		std::string get_id();
+		int get_team();
 	private:
 		int team;
 		int id;

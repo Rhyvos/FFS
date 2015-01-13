@@ -10,9 +10,24 @@ Game::Game(Socket_session *session) :
 	session(session), display(NULL),event_queue(NULL),timer(NULL)
 {
 	cout<<"New game"<<endl;
-	
+	stop=false;
 
 }
+
+Game::~Game(){
+	stop=true;
+	for(set<Player*>::iterator it=Players.begin(); it!=Players.end() ; it++){
+		delete (*it);
+	}
+	/*for(set<Projectile*>::iterator it=Projectiles.begin(); it!=Projectiles.end() ; it++){
+		delete (*it);
+	}*/
+	al_destroy_display(display);
+	al_destroy_event_queue(event_queue);
+	al_destroy_font(font);
+	al_destroy_timer(timer);
+}
+
 
 
 Player * Game::find_player(std::string name){
@@ -47,17 +62,15 @@ void Game::add_player(Player *p){
 }
 
 void Game::remove_player(Player *p){
-	Players.erase(p);
-	
+	Players.erase(p);	
 }
+
+
 
 void Game::start(){
 	
 	redraw=true;
-	if(!al_init()) {
-      fprintf(stderr, "failed to initialize allegro!\n");
-      return;
-   }
+	
  
    timer = al_create_timer(1.0 / FPS);
    if(!timer) {
@@ -74,7 +87,7 @@ void Game::start(){
 	al_init_ttf_addon();
 	font = al_load_ttf_font("Arial.ttf",10,0 );
    if (!font){
-			  fprintf(stderr, "Could not load 'pirulen.ttf'.\n");
+			  fprintf(stderr, "Could not load 'Arial.ttf'.\n");
 			  return ;
 		   }
    event_queue = al_create_event_queue();
@@ -87,13 +100,13 @@ void Game::start(){
    al_init_primitives_addon();
    al_install_keyboard();
 	
-	
+	al_register_event_source(event_queue, al_get_display_event_source(display));
 	al_register_event_source(event_queue,al_get_timer_event_source(timer));
 	al_register_event_source(event_queue,al_get_keyboard_event_source());
 	al_start_timer(timer);
 	ALLEGRO_EVENT ev;
 	
-	while(true)
+	while(!stop)
    {
 
 
@@ -101,9 +114,9 @@ void Game::start(){
 
       if(ev.type == ALLEGRO_EVENT_TIMER) {
          redraw = true;
-      }
-      else if(ev.type == ALLEGRO_EVENT_DISPLAY_CLOSE) {
-         break;
+      }else if(ev.type == ALLEGRO_EVENT_DISPLAY_CLOSE) {
+		  session->write("leave_game");
+         stop=true;
       }else if(ev.type == ALLEGRO_EVENT_KEY_DOWN) {
          if(ev.keyboard.keycode == ALLEGRO_KEY_W) {
 			 session->write("jump,240.0");
@@ -117,11 +130,6 @@ void Game::start(){
 			 session->write("start_move,-100.0");
 			 //boost::thread t(boost::bind(&Socket_session::write,session,"start_move,-20.0"));
          }
- 
-        
- 
-		   
-   
       }else if(ev.type == ALLEGRO_EVENT_KEY_UP) {
 		 if(ev.keyboard.keycode == ALLEGRO_KEY_D) {
 
@@ -142,6 +150,14 @@ void Game::start(){
          redraw = false;
 		 
 		 update_players();
+
+		 for(int i=50;i<=600;i+=50){
+			 al_draw_line( i, 0, i, 480, al_map_rgb(128,128,0),1); 
+		 }
+		 for(int i=50;i<=450;i+=50){
+			 al_draw_line( 0, i, 640, i, al_map_rgb(128,128,0),1); 
+		 }
+
 		 draw_players();
 
          
@@ -154,10 +170,11 @@ void Game::start(){
    al_destroy_timer(timer);
    al_destroy_display(display);
    al_destroy_event_queue(event_queue);
- 
+	
 }
 
 void Game::end(){
+	stop=true;
 
 }
 
@@ -182,6 +199,7 @@ void Game::draw_players(){
 		al_draw_text(font, al_map_rgb(0,0,0),x, 415-y,ALLEGRO_ALIGN_CENTRE, cstr);
 		al_draw_text(font, al_map_rgb(0,0,0),x, 425-y,ALLEGRO_ALIGN_CENTRE, cstr1);
 		al_draw_text(font, al_map_rgb(0,0,0),x, 435-y,ALLEGRO_ALIGN_CENTRE, cstr2);
-		al_draw_filled_circle(x,450-y, 5, al_map_rgb(255,0,0));	
+
+	
 	}
 }

@@ -37,6 +37,13 @@ Socket_session::Socket_session(string ip, string port):
 
 }
 
+Socket_session::~Socket_session(){
+	delete game;
+	delete io_service;
+	delete socket;
+}
+
+
 
 void Socket_session::read(){
 	char msg[MAX_MESSAGE_LENGTH];
@@ -98,7 +105,10 @@ void Socket_session::game_msg(std::vector<std::string> msg){
 		Player *p=new Player(msg[2],stoi(msg[3]));
 		game->add_player(p);
 	}else if(!msg[1].compare("leave_game")&&game!=NULL){
-		
+		Player *p = game->find_player(stoi(msg[2]));
+		if(p!=NULL){
+			game->remove_player(p);
+		}
 	}else{
 		cout<<msg[0]<<"--"<<msg[1]<<endl;
 	}

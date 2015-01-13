@@ -6,11 +6,13 @@
 class Player : public Movement{
 public:
 	Player(std::string name, int id);
+	~Player();
 	void shoot();
 	ALLEGRO_BITMAP get_model();
 	std::string get_name();
 	int get_id();
 	void read_msg(std::vector<std::string> msg);
+	void update();
 private:
 	std::string name;
 	int id;

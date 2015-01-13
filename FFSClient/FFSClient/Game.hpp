@@ -10,6 +10,7 @@ class Socket_session;
 class Game{
 public:
 	Game(Socket_session *session);
+	~Game();
 	void start();
 	void end();
 	void add_player(Player *p);
@@ -32,6 +33,7 @@ private:
 	ALLEGRO_TIMER *timer;
 	ALLEGRO_FONT *font;
 	bool redraw;
+	bool stop;
 };
 
 

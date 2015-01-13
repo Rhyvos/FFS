@@ -9,6 +9,8 @@
 #include <set>
 #include <tchar.h>
 #include <math.h>
+#include <stdlib.h> 
+#include <stdio.h> 
 #include <boost\asio.hpp>
 #include <boost\thread\mutex.hpp>
 #include <boost\thread.hpp>

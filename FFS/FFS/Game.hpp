@@ -12,7 +12,7 @@ class Game{
 
 		void add_player(Player* p);
 		void remove_player(Player* p);
-		void start(int time);
+		void start();
 		void game_end();
 		void send(std::string msg);
 
@@ -29,6 +29,8 @@ class Game{
 		Lobby* lobby;
 		std::set<Player*> Players;
 		std::list<Projectile*> Projectiles;
+		ALLEGRO_EVENT_QUEUE *event_queue;
+		ALLEGRO_TIMER *timer;
 		void update();
 		void build_map();
 		void start_players();
@@ -36,6 +38,8 @@ class Game{
 		const std::string name;
 		int team_size; 
 		int teams;
+		int time;
+		bool running;
 };
 
 

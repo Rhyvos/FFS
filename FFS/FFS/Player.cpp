@@ -139,7 +139,14 @@ using namespace std;
 		else if(!split_msg[0].compare("action")){			/*       No Scripted       */
 			cout<<"["<<name<<"] action"<<endl;
 		}
-		else{
+		else if(!split_msg[0].compare("leave_game")){
+			if(game!=NULL){
+				game->remove_player(this);
+				game=NULL;
+			}	
+			else
+				send("error,no game");
+		}else{
 			lobby->send("["+get_name()+"] "+ str);	
 		}
 	}
@@ -204,4 +211,8 @@ using namespace std;
 
 	string Player::get_id(){
 		return to_string(id);
+	}
+
+	int Player::get_team(){
+		return team;
 	}

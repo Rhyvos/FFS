@@ -7,6 +7,7 @@ class Socket_session{
 
 public:
 	Socket_session(std::string ip,std::string port);
+	~Socket_session();
 	void read();
 	void handle_read(char *msg,std::size_t bytes_transferred);
 	void write(std::string msg);

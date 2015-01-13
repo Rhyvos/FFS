@@ -7,9 +7,21 @@ using namespace std;
 		this->ip=ip;
 		this->port=port;
 		game_id=0;
+	
+
 	}
 
 	typedef boost::shared_ptr<boost::asio::ip::tcp::socket> socket_ptr;
+
+	Lobby::~Lobby(){
+		for(set<Player*>::iterator it=Players.begin(); it!=Players.end() ; it++){
+			(*it)->send("SERVER SHUTDOWN");
+			delete (*it);
+		}
+		for(set<Game*>::iterator it=Games.begin(); it!=Games.end() ; it++){
+			delete (*it);
+		}
+	}
 
 	void Lobby::do_accept(){
 

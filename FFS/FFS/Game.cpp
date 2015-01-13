@@ -9,14 +9,23 @@ using namespace std;
 		
 
 		Game::Game(std::string name,int id,int team_size, int teams, Lobby* l):
-		id(id), name(name), lobby(l)
+		id(id), name(name), lobby(l), timer(NULL), event_queue(NULL)
 		{
 			this->team_size=team_size;
 			this->teams=teams;
+			this->time=7200;
+			running =false;
 		}
 		Game::~Game(){
 			Players.clear();
-
+			for(list<Projectile*>::iterator it=Projectiles.begin(); it!=Projectiles.end(); it++){
+				delete (*it);
+			}
+			time=0;
+			boost::this_thread::sleep(boost::posix_time::milliseconds(1000));
+			al_destroy_timer(timer);
+			al_destroy_event_queue(event_queue);
+			
 		}
 
 		std::string Game::get_name(){
@@ -25,37 +34,60 @@ using namespace std;
 
 		void Game::add_player(Player* p){
 			if(Players.size()<team_size*teams){
+				p->send("game,create");
+
+				for(set<Player*>::iterator it=Players.begin(); it!=Players.end() ; it++)
+					p->send("game,join_game,"+(*it)->get_name()+","+(*it)->get_id()+","+name);
+
 				
 				Players.insert(p);
-				p->send("game,create");
-				if(Players.size()==max_players())
-					boost::thread t(boost::bind(&Game::start,this,7200));
+				boost::this_thread::sleep(boost::posix_time::milliseconds(100));
+				this->send("game,join_game,"+p->get_name()+","+p->get_id()+","+name);
+
+				
+				if(Players.size()==1&&!running)
+					boost::thread t(boost::bind(&Game::start,this));
 			}
 			else{
 				p->send("error,Game is full");
+				return;
 			}
+
+			if(running){
+				p->in_game=true;
+				p->set_team(rand()%teams);
+				p->reset();
+				p->move_to(rand()%640,0);
+				send("player,"+p->get_id()+",team,"+to_string(p->get_team()));
+				for(set<Player*>::iterator it=Players.begin(); it!=Players.end() ; it++)
+					p->send("player,"+(*it)->get_id()+",move_to,"+(*it)->get_string_x()+","+(*it)->get_string_y());
+				this->send("player,"+p->get_id()+",move_to,"+p->get_string_x()+","+p->get_string_y());
+				p->send("game,start");
+			}
+
+
+			
 		}
 
 		void Game::remove_player(Player* p){
+			this->send("game,leave_game,"+p->get_id()+","+std::to_string(id)+","+name);
 			Players.erase(p);
-			send("game,leave_game,"+p->get_id()+","+std::to_string(id)+","+name);
+			p->in_game=false;
+			
 		}
 
-		void Game::start(int time){
+		void Game::start(){
 			try{
 
-			if(!al_init()) {
-				  fprintf(stderr, "failed to initialize allegro!\n");
-				  return;
-			}
+			
  
-			ALLEGRO_TIMER *timer = al_create_timer(1.0 / 60.0);
+			timer = al_create_timer(1.0 / 60.0);
 			if(!timer) {
 				  fprintf(stderr, "failed to create timer!\n");
 				  return;
 			}
 
-			ALLEGRO_EVENT_QUEUE *event_queue;
+
 
 			event_queue = al_create_event_queue();
 				if(!event_queue) {
@@ -69,18 +101,16 @@ using namespace std;
 				boost::this_thread::sleep(boost::posix_time::milliseconds(1000));
 			}
 			
-			if(Players.size()!=max_players()){
+			if(Players.size()==0){
 				send("game,stop");
 				game_end();
 				lobby->remove_game(this);
 				return;
 			}
-			
+			running=true;
 			build_map();
 			start_players();
-			cout<<"Game Start"<<endl;
 			send("game,start");
-
 			al_register_event_source(event_queue,al_get_timer_event_source(timer));
 			al_start_timer(timer);
 			ALLEGRO_EVENT ev;
@@ -90,6 +120,10 @@ using namespace std;
 					al_wait_for_event(event_queue, &ev);
 					if(ev.type == ALLEGRO_EVENT_TIMER) {
 						update();
+					}else if(ev.type == ALLEGRO_EVENT_DISPLAY_CLOSE)
+					{ 
+						cout<<"ALLEGRO_EVENT_DISPLAY_CLOSE"<<endl;
+						return; 
 					}
 				
 				
@@ -128,20 +162,16 @@ using namespace std;
 
 		void Game::start_players(){
 			int i=0;
-			for(set<Player*>::iterator it1=Players.begin(); it1!=Players.end() ; it1++){
-				for(set<Player*>::iterator it2=Players.begin(); it2!=Players.end() ; it2++){
-					(*it2)->send("game,join_game,"+(*it1)->get_name()+","+(*it1)->get_id()+","+name);
-			}
-			}
 
 
 			
 			for(set<Player*>::iterator it=Players.begin(); it!=Players.end() && i<team_size ; i++){
+				
 				for(int j=0 ; it!=Players.end() && j<teams ; j++, it++){
 					(*it)->in_game=true;
 					(*it)->set_team(j);
 					(*it)->reset();
-					(*it)->move_to(rand()%100,rand()%100);
+					(*it)->move_to(rand()%640,0);
 					send("player,"+(*it)->get_id()+",team,"+to_string(j));
 					this->send("player,"+(*it)->get_id()+",move_to,"+(*it)->get_string_x()+","+(*it)->get_string_y());
 					
@@ -213,6 +243,7 @@ float iloczyn(float x1, float y1, float x2,float y2, float x3, float y3) {
 			for(set<Player*>::iterator it=Players.begin(); it!=Players.end()  ; it++){
 				(*it)->end_game();
 			}
+			running =false;
 		}
 
 		void Game::add_projectile(Projectile *p){

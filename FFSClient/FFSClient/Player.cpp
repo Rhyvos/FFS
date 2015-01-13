@@ -9,6 +9,12 @@ Player::Player(std::string name, int id) : Movement(60)
 	cout<<"New Player: "<<name<<" id:"<<id<<endl;
 }
 
+Player::~Player(){
+	al_destroy_bitmap(model);
+	al_destroy_bitmap(weapon);
+}
+
+
 void Player::read_msg(std::vector<std::string> msg){
 
 
@@ -52,6 +58,11 @@ std::string Player::get_name(){
 
 int Player::get_id(){
 	return id;
+}
+
+void Player::update(){
+	Movement::update();
+	al_draw_filled_circle(x,450-y, 5, al_map_rgb(255,0,0));
 }
 
 
