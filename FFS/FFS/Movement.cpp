@@ -125,3 +125,10 @@
 			maximum_vy=120;
 		}
 
+		void Movement::set_maximum_vx(float vx){
+			maximum_vx=vx;
+		}
+
+		void Movement::set_maximum_vy(float vy){
+			maximum_vy=vy;
+		}

@@ -82,25 +82,37 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Bullet.hpp" />
+    <ClInclude Include="Free.h" />
     <ClInclude Include="Game.hpp" />
+    <ClInclude Include="Gun.h" />
+    <ClInclude Include="Map_Object_Factory.h" />
     <ClInclude Include="Headers.h" />
     <ClInclude Include="Lobby.hpp" />
+    <ClInclude Include="Map.h" />
+    <ClInclude Include="Map_Object.h" />
     <ClInclude Include="Movement.hpp" />
     <ClInclude Include="Player.hpp" />
     <ClInclude Include="Projectile.hpp" />
+    <ClInclude Include="Solid.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="targetver.h" />
+    <ClInclude Include="Weapon.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Bullet.cpp" />
     <ClCompile Include="FFS.cpp" />
     <ClCompile Include="Game.cpp" />
+    <ClCompile Include="Gun.cpp" />
     <ClCompile Include="Lobby.cpp" />
+    <ClCompile Include="Map.cpp" />
+    <ClCompile Include="Map_Object.cpp" />
+    <ClCompile Include="Map_Object_Factory.cpp" />
     <ClCompile Include="Movement.cpp" />
     <ClCompile Include="Player.cpp" />
     <ClCompile Include="Projectile.cpp" />
     <ClCompile Include="Projectiles_Factory.cpp" />
     <ClCompile Include="stdafx.cpp" />
+    <ClCompile Include="Weapon.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

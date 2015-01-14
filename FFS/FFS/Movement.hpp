@@ -21,7 +21,8 @@ class Movement{
 		virtual void update();
 		void reset();
 		void move_to(float x, float y);
-
+		void set_maximum_vx(float vx);
+		void set_maximum_vy(float vy);
 	protected:
 		bool stop;
 		float x,y;

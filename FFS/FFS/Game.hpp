@@ -39,6 +39,7 @@ class Game{
 		int team_size; 
 		int teams;
 		int time;
+		int projectile_id;
 		bool running;
 };
 

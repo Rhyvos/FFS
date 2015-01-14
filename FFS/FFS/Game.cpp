@@ -15,6 +15,7 @@ using namespace std;
 			this->teams=teams;
 			this->time=7200;
 			running =false;
+			projectile_id=0;
 		}
 		Game::~Game(){
 			Players.clear();
@@ -192,7 +193,6 @@ using namespace std;
 			for(list<Projectile*>::iterator it=Projectiles.begin(); it!=Projectiles.end() ; it++){
 				if((*it)->is_alive()){
 					(*it)->update();
-					cout<<"bullet x:"<<(*it)->get_x()<<" y:"<<(*it)->get_y()<<endl;
 				}
 
 				
@@ -210,7 +210,6 @@ float iloczyn(float x1, float y1, float x2,float y2, float x3, float y3) {
 					p->move_to(0,p->get_y());
 				if(x>640)
 					p->move_to(640,p->get_y());
-				cout<<"tutaj"<<endl;
 				send("player,"+p->get_id()+",instant_stop_x,"+p->get_string_x()+","+p->get_string_y());
 			}
 			if(y<0||y>480){
@@ -247,5 +246,8 @@ float iloczyn(float x1, float y1, float x2,float y2, float x3, float y3) {
 		}
 
 		void Game::add_projectile(Projectile *p){
+			p->set_id(projectile_id++);
 			Projectiles.push_back(p);
+			cout<<p->get_string_x()+","+p->get_string_y()<<endl;
+			send("game,add_projectile,"+to_string(p->get_id())+","+p->get_string_x()+","+p->get_string_y()+","+to_string(p->get_alpha())+","+to_string(p->get_team()));
 		}

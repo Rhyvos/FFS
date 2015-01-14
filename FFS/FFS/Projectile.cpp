@@ -30,3 +30,16 @@ void Projectile::update(){
 		y+=vy/LOOP_PER_SECOND;
 		life--;
 }
+
+float Projectile::get_alpha(){
+	return alpha;
+}
+void Projectile::set_alpha(float alpha){
+	this->alpha=alpha;
+}
+void Projectile::set_id(int id){
+	this->id=id;
+}
+int Projectile::get_id(){
+	return id;
+}
