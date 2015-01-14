@@ -1,9 +1,11 @@
 #include "Player.h"
-
+#include "Game.hpp"
+#include "Projectile.h"
 using namespace std;
 
-Player::Player(std::string name, int id) : Movement(60)
+Player::Player(std::string name, int id, Game *g) : Movement(60)
 {
+	this->game=g;
 	this->name=name;
 	this->id=id;
 	cout<<"New Player: "<<name<<" id:"<<id<<endl;
@@ -28,7 +30,7 @@ void Player::read_msg(std::vector<std::string> msg){
 		move_to(stof(msg[4]),stof(msg[5]));
 		stop_move();
 	}else if(!msg[2].compare("shoot")){
-		shoot();
+		shoot(0.0);
 	}else if(!msg[2].compare("swap_weapon")){
 		cout<<name<<" swap weapon"<<endl;
 	}else if(!msg[2].compare("action")){
@@ -67,6 +69,6 @@ void Player::update(){
 
 
 
-void Player::shoot(){
-	cout<<"shoot"<<endl;
+void Player::shoot(float alpha){
+	
 }

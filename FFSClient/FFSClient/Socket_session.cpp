@@ -99,16 +99,22 @@ void Socket_session::game_msg(std::vector<std::string> msg){
 		game->end();
 	}else if(!msg[1].compare("create")){
 		game=new Game(this);
+		game->player_id=player_id;
 	}else if(!msg[1].compare("game_list")){
 		cout<<"Game: "<<msg[2]<<" Players:"<<msg[3]<<"/"<<msg[2]<<endl;
 	}else if(!msg[1].compare("join_game")&&game!=NULL){
-		Player *p=new Player(msg[2],stoi(msg[3]));
+		Player *p=new Player(msg[2],stoi(msg[3]),game);
 		game->add_player(p);
 	}else if(!msg[1].compare("leave_game")&&game!=NULL){
 		Player *p = game->find_player(stoi(msg[2]));
 		if(p!=NULL){
 			game->remove_player(p);
 		}
+	}else if(!msg[1].compare("your_id")){
+		player_id=stoi(msg[2]);
+	}else if(!msg[1].compare("add_projectile")&&game!=NULL){
+		Projectile *p=new Projectile(stoi(msg[2]),stof(msg[3]),stof(msg[4]),stof(msg[5]));
+		game->add_projectile(p);
 	}else{
 		cout<<msg[0]<<"--"<<msg[1]<<endl;
 	}

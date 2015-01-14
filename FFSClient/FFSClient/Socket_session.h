@@ -17,6 +17,7 @@ public:
 	void map(std::vector<std::string> msg);
 	boost::mutex mtx_;
 private:
+	int player_id;
 	Game *game;
 	boost::asio::io_service* io_service;
 	boost::asio::ip::tcp::socket* socket;

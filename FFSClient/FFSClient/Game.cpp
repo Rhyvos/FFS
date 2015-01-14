@@ -1,7 +1,7 @@
 #include "Game.hpp"
 #include "Socket_session.h"
 
-
+#define PI 3.14159265
 const float FPS = 60;
 
 using namespace std;
@@ -11,7 +11,7 @@ Game::Game(Socket_session *session) :
 {
 	cout<<"New game"<<endl;
 	stop=false;
-
+	client_player=NULL;
 }
 
 Game::~Game(){
@@ -58,6 +58,9 @@ Player * Game::find_player(int id){
 
 void Game::add_player(Player *p){
 	Players.insert(p);
+	if(p->get_id()==player_id)
+	client_player=p;
+
 	
 }
 
@@ -99,7 +102,8 @@ void Game::start(){
    }
    al_init_primitives_addon();
    al_install_keyboard();
-	
+	al_install_mouse();
+	al_register_event_source(event_queue, al_get_mouse_event_source());
 	al_register_event_source(event_queue, al_get_display_event_source(display));
 	al_register_event_source(event_queue,al_get_timer_event_source(timer));
 	al_register_event_source(event_queue,al_get_keyboard_event_source());
@@ -139,25 +143,30 @@ void Game::start(){
 
 			 boost::thread t(boost::bind(&Socket_session::write,session,"stop_move,0.0"));
          }
- 
-         
- 
-   
-      }
+	  }else if(ev.type == ALLEGRO_EVENT_MOUSE_BUTTON_DOWN){
+		  if(ev.mouse.button==1&&client_player!=NULL){
+				int x=(float)ev.mouse.x-client_player->get_x();
+				int y=(float)(450-ev.mouse.y)-client_player->get_y();
+				float alpha=atan2 (y,x) * 180 / PI;
+				session->write("shoot,"+to_string(alpha));
+		  }
+
+				
+	  }
 
       if(redraw && al_is_event_queue_empty(event_queue)) {
 		 al_clear_to_color(al_map_rgb(255,255,255));
          redraw = false;
 		 
-		 update_players();
-
+		 
 		 for(int i=50;i<=600;i+=50){
 			 al_draw_line( i, 0, i, 480, al_map_rgb(128,128,0),1); 
 		 }
 		 for(int i=50;i<=450;i+=50){
 			 al_draw_line( 0, i, 640, i, al_map_rgb(128,128,0),1); 
 		 }
-
+		 update_players();
+		 update_projectiles();
 		 draw_players();
 
          
@@ -202,4 +211,26 @@ void Game::draw_players(){
 
 	
 	}
+}
+
+
+void Game::add_projectile(Projectile *p){
+	Projectiles.push_back(p);
+}
+
+void Game::remove_projectile(int id){
+	for(list<Projectile*>::iterator it=Projectiles.begin() ; it!=Projectiles.end(); it++){
+		if(id==(*it)->get_id()){
+			delete (*it);
+			Projectiles.erase(it);
+		}
+
+	}
+}
+
+void Game::update_projectiles(){
+	for(list<Projectile*>::iterator it=Projectiles.begin() ; it!=Projectiles.end(); it++){
+		(*it)->update();
+	}
+
 }
