@@ -72,10 +72,10 @@
     <ClInclude Include="Map_Object_Factory.h">
       <Filter>Header Files\Map</Filter>
     </ClInclude>
-    <ClInclude Include="Solid.h">
+    <ClInclude Include="Free_Block.h">
       <Filter>Header Files\Map</Filter>
     </ClInclude>
-    <ClInclude Include="Free.h">
+    <ClInclude Include="Solid_Block.h">
       <Filter>Header Files\Map</Filter>
     </ClInclude>
   </ItemGroup>
@@ -121,6 +121,12 @@
     </ClCompile>
     <ClCompile Include="Projectiles_Factory.cpp">
       <Filter>Source Files\Weapon</Filter>
+    </ClCompile>
+    <ClCompile Include="Free_Block.cpp">
+      <Filter>Source Files\Map</Filter>
+    </ClCompile>
+    <ClCompile Include="Solid_Block.cpp">
+      <Filter>Source Files\Map</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

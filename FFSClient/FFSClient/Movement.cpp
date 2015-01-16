@@ -25,9 +25,7 @@
 		void Movement::stop_move(){
 
 			ax=-vx;
-			stop=true;
-
-			
+			stop=true;	
 		}
 
 		void Movement::instant_stop_x(){
@@ -91,6 +89,7 @@
 			}
 
 			if(stop==true&&vx*ax>=0){
+
 				vx=0;
 				ax=0;
 				stop=false;
@@ -99,6 +98,7 @@
 			vy+=ay/LOOP_PER_SECOND;
 			x+=vx/LOOP_PER_SECOND;
 			y+=vy/LOOP_PER_SECOND;
+			
 		}
 
 		void Movement::move_to(float x, float y){
@@ -133,6 +133,3 @@
 			maximum_vy=vy;
 		}
 
-		void Movement::fall(){
-			ay=GRAVITATION;
-		}

@@ -1,8 +1,8 @@
 #ifndef MAP_OBJECT_FACTORY_H
 #define MAP_OBJECT_FACTORY_H
 #include "Map_Object.h"
-#include "Solid.h"
-#include "Free.h"
+#include "Solid_Block.h"
+#include "Free_Block.h"
 
 class Map_Object_Factory{
 public:

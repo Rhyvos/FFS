@@ -1,11 +1,11 @@
-#ifndef FREE_H
-#define FREE_H
+#ifndef SOLID_BLOCK_H
+#define SOLID_BLOCK_H
 
 #include "Map_Object.h"
 
-class Free: public Map_Object{
+class Solid_Block : public Map_Object{
 public:
-	Free();
+	Solid_Block();
 	void collision(Player *p);
 	void collision(Projectile *p);
 	void action(Player *p);
@@ -13,4 +13,4 @@ public:
 };
 
 
-#endif // !FREE_H
+#endif // !SOLID_H
