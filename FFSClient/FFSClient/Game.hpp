@@ -27,6 +27,7 @@ public:
 	int player_id;
 	
 private:
+	std::vector<std::vector<std::vector<int>>> Map_Matrix;
 	std::set<Player *> Players;
 	Player * client_player;
 	std::list<Projectile *> Projectiles;
@@ -35,6 +36,7 @@ private:
 	ALLEGRO_EVENT_QUEUE *event_queue;
 	ALLEGRO_TIMER *timer;
 	ALLEGRO_FONT *font;
+	ALLEGRO_BITMAP *map;
 	bool redraw;
 	bool stop;
 };

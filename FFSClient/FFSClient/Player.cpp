@@ -49,6 +49,9 @@ void Player::read_msg(std::vector<std::string> msg){
 
 	}else if(!msg[2].compare("hp")){
 		hp=stof(msg[3]);
+	}else if(!msg[2].compare("fall")){
+		move_to(stof(msg[3]),stof(msg[4]));
+		fall();
 	}
 
 

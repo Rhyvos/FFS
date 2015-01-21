@@ -3,7 +3,6 @@
 #include "Game.hpp"
 #include "Lobby.hpp"
 #include "Player.hpp"
-
 using namespace std;
 
 		
@@ -97,7 +96,7 @@ using namespace std;
 				return ;
 			}
 
-			for(int i=0;i<10;i++){
+			for(int i=0;i<2;i++){
 				
 				boost::this_thread::sleep(boost::posix_time::milliseconds(1000));
 			}
@@ -172,7 +171,7 @@ using namespace std;
 					(*it)->in_game=true;
 					(*it)->set_team(j);
 					(*it)->reset();
-					(*it)->move_to(rand()%640,0);
+					(*it)->move_to(150,150);
 					send("player,"+(*it)->get_id()+",team,"+to_string(j));
 					this->send("player,"+(*it)->get_id()+",move_to,"+(*it)->get_string_x()+","+(*it)->get_string_y());
 					
@@ -183,18 +182,17 @@ using namespace std;
 		}
 
 		void Game::build_map(){
+		map=new Map("Map1.txt",this);
+
+
 		}
 
 		void Game::update(){
 			for(set<Player*>::iterator it=Players.begin(); it!=Players.end() ; it++){
-				collisions(*it);
-				(*it)->update();
+				
+				map->collision(*it);
 			}
 			for(list<Projectile*>::iterator it=Projectiles.begin(); it!=Projectiles.end() ; it++){
-				if((*it)->is_alive()){
-					(*it)->update();
-				}
-
 				
 			}
 		}
@@ -248,6 +246,6 @@ float iloczyn(float x1, float y1, float x2,float y2, float x3, float y3) {
 		void Game::add_projectile(Projectile *p){
 			p->set_id(projectile_id++);
 			Projectiles.push_back(p);
-			cout<<p->get_string_x()+","+p->get_string_y()<<endl;
+
 			send("game,add_projectile,"+to_string(p->get_id())+","+p->get_string_x()+","+p->get_string_y()+","+to_string(p->get_alpha())+","+to_string(p->get_team()));
 		}

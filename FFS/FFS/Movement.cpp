@@ -15,6 +15,7 @@
 			ay=0;
 			maximum_vx=120;
 			maximum_vy=120;
+			falling= false;
 		}
 
 		void Movement::start_move(float accelerartion){
@@ -35,14 +36,10 @@
 			ax=0;
 		}
 		void Movement::instant_stop_y(){
-			if(vy<0){
-				vy=0;
-				ay=0;
-			}
-			else{	
-				vy=0;
-				ay=GRAVITATION;
-			}
+			vy=0;
+			ay=0;
+			falling=false;
+
 		}
 
 		void Movement::jump(float vy){
@@ -123,6 +120,7 @@
 			ay=0;
 			maximum_vx=120;
 			maximum_vy=120;
+			falling=false;
 		}
 
 		void Movement::set_maximum_vx(float vx){
@@ -135,4 +133,9 @@
 
 		void Movement::fall(){
 			ay=GRAVITATION;
+			falling=true;
+		}
+
+		bool Movement::is_falling(){
+			return falling;
 		}

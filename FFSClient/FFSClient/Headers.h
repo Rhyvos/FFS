@@ -5,6 +5,7 @@
 #include <string>
 #include <vector>
 #include <set>
+#include <fstream>
 #include <boost\asio.hpp>
 #include <boost\thread\mutex.hpp>
 #include <boost\thread.hpp>

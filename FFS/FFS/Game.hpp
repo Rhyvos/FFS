@@ -2,6 +2,7 @@
 #define GAME_H
 #include "Player.hpp"
 #include "Projectile.hpp"
+#include "Map.h"
 class Lobby;
 
 class Game{
@@ -27,6 +28,7 @@ class Game{
 
 	private:
 		Lobby* lobby;
+		Map *map;
 		std::set<Player*> Players;
 		std::list<Projectile*> Projectiles;
 		ALLEGRO_EVENT_QUEUE *event_queue;

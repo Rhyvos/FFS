@@ -109,7 +109,7 @@ void Game::start(){
 	al_register_event_source(event_queue,al_get_keyboard_event_source());
 	al_start_timer(timer);
 	ALLEGRO_EVENT ev;
-	
+	create_map("Map1.txt");
 	while(!stop)
    {
 
@@ -158,7 +158,7 @@ void Game::start(){
 		 al_clear_to_color(al_map_rgb(255,255,255));
          redraw = false;
 		 
-		 
+		  
 		 for(int i=50;i<=600;i+=50){
 			 al_draw_line( i, 0, i, 480, al_map_rgb(128,128,0),1); 
 		 }
@@ -168,8 +168,8 @@ void Game::start(){
 		 update_players();
 		 update_projectiles();
 		 draw_players();
-
-         
+		 
+         al_draw_bitmap(map, 640, 480, 0);
 
          al_flip_display();
 
@@ -223,6 +223,7 @@ void Game::remove_projectile(int id){
 		if(id==(*it)->get_id()){
 			delete (*it);
 			Projectiles.erase(it);
+			return;
 		}
 
 	}
@@ -232,5 +233,65 @@ void Game::update_projectiles(){
 	for(list<Projectile*>::iterator it=Projectiles.begin() ; it!=Projectiles.end(); it++){
 		(*it)->update();
 	}
+
+}
+
+void Game::create_map(std::string name){
+
+
+	map = al_create_bitmap(640,480);
+   if(!map) {
+      fprintf(stderr, "failed to create map!\n");
+      al_destroy_display(display);
+      al_destroy_timer(timer);
+      return;
+   }
+ 
+   al_set_target_bitmap(map);
+ 
+   al_clear_to_color(al_map_rgb(0,0,128));
+ 
+	al_draw_filled_rectangle(0,450,600,400,al_map_rgb(0,0,0));
+
+	std::ifstream input (name, std::ifstream::in);
+	char x[1024];
+	int i=0,j=0;
+	int map_x,map_y;
+	input.getline(x,1024);
+	std::stringstream buffer(x);
+	buffer.getline(x,256,'\t');
+	map_x=std::stoi(x);
+	buffer.getline(x,256,'\t');
+	map_y=std::stoi(x);
+
+	std::cout<<"Building Map: "<<name<<std::endl;
+	std::vector<std::vector<std::vector<int>>> Map_Matrix1(map_x,std::vector<std::vector<int>>(map_y,std::vector<int>(10)));
+	Map_Matrix=Map_Matrix1;
+	while(!input.eof()){
+		input.getline(x,1024);
+		std::stringstream buffer(x);
+		while(!buffer.eof()){
+			buffer.getline(x,1024,'\t');
+			std::string s(x);
+			std::cout<<s;
+			if(s.compare("0")==0){
+				Map_Matrix[j][i][0]=0;
+				al_draw_filled_rectangle(j*50,450-(i*50),j*50+50,450-(i*50)+50,al_map_rgb(255,255,255));
+			}
+			else if(s.compare("1")==0){
+				Map_Matrix[j][i][0]=1;
+				al_draw_filled_rectangle(j*50,450-(i*50),j*50+50,450-(i*50)+50,al_map_rgb(0,0,0));
+			}
+
+
+				
+			j++;
+		}
+		std::cout<<std::endl;
+		i++;
+		j=0;
+	}
+
+	al_set_target_bitmap(al_get_backbuffer(display));
 
 }

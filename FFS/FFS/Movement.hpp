@@ -24,8 +24,10 @@ class Movement{
 		void set_maximum_vx(float vx);
 		void set_maximum_vy(float vy);
 		void fall();
+		bool is_falling();
 	protected:
 		bool stop;
+		bool falling;
 		float x,y;
 		float vx,vy;
 		float ax,ay;

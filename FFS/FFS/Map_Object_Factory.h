@@ -6,8 +6,12 @@
 
 class Map_Object_Factory{
 public:
-	Map_Object * Solid();
-	Map_Object * Free();
+	Map_Object_Factory(Game *g, Map *m);
+	Map_Object * Solid(int x, int y);
+	Map_Object * Free(int x, int y);
+private:
+	Game *g;
+	Map *map;
 };
 
 
