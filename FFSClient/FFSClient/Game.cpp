@@ -157,8 +157,18 @@ void Game::start(){
       if(redraw && al_is_event_queue_empty(event_queue)) {
 		 al_clear_to_color(al_map_rgb(255,255,255));
          redraw = false;
-		 
-		  
+		 int j=0,i=0;
+		 for (std::vector<std::vector<std::vector<int>>>::iterator it = Map_Matrix.begin(); it != Map_Matrix.end(); ++it, j++){
+			 for(std::vector<std::vector<int>>::iterator it1 = (*it).begin(); it1 != (*it).end(); ++it1, i++){
+				 if((*it1)[0]==1){
+					 al_draw_filled_rectangle(j*50,400-(i*50),j*50+50,400-(i*50)+50,al_map_rgb(0,0,0));
+
+				 }
+				 
+			 }
+			i=0;
+		 }
+
 		 for(int i=50;i<=600;i+=50){
 			 al_draw_line( i, 0, i, 480, al_map_rgb(128,128,0),1); 
 		 }
@@ -169,7 +179,7 @@ void Game::start(){
 		 update_projectiles();
 		 draw_players();
 		 
-         al_draw_bitmap(map, 640, 480, 0);
+         //al_draw_bitmap(map, 640, 480, 0);
 
          al_flip_display();
 
@@ -221,6 +231,7 @@ void Game::add_projectile(Projectile *p){
 void Game::remove_projectile(int id){
 	for(list<Projectile*>::iterator it=Projectiles.begin() ; it!=Projectiles.end(); it++){
 		if(id==(*it)->get_id()){
+			std::cout<<"remove projectile:"<<(*it)->get_id()<<endl;
 			delete (*it);
 			Projectiles.erase(it);
 			return;
@@ -246,12 +257,12 @@ void Game::create_map(std::string name){
       al_destroy_timer(timer);
       return;
    }
- 
+ al_draw_filled_rectangle(0,450,600,400,al_map_rgb(0,0,0));
    al_set_target_bitmap(map);
  
    al_clear_to_color(al_map_rgb(0,0,128));
  
-	al_draw_filled_rectangle(0,450,600,400,al_map_rgb(0,0,0));
+	
 
 	std::ifstream input (name, std::ifstream::in);
 	char x[1024];

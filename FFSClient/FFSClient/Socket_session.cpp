@@ -115,6 +115,8 @@ void Socket_session::game_msg(std::vector<std::string> msg){
 	}else if(!msg[1].compare("add_projectile")&&game!=NULL){
 		Projectile *p=new Projectile(stoi(msg[2]),stof(msg[3]),stof(msg[4]),stof(msg[5]));
 		game->add_projectile(p);
+	}else if(!msg[1].compare("remove_projectile")&&game!=NULL){
+		game->remove_projectile(stoi(msg[2]));
 	}else{
 		cout<<msg[0]<<"--"<<msg[1]<<endl;
 	}

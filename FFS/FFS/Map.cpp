@@ -40,8 +40,8 @@ void Map::collision(Player *p){
 
 	if(p->get_next_x()>0&&p->get_next_x()<x*50+50&&p->get_next_y()>0&&p->get_next_y()<y*50+50){
 		if(Map_Matrix[(int)p->get_next_x()/50][(int)p->get_next_y()/50][0]!=NULL){
-			std::cout<<"x:"<<(int)p->get_next_x()/50<<" y:"<<(int)p->get_next_y()/50<<std::endl;
-			std::cout<<"px:"<<p->get_next_x()<<" py:"<<p->get_next_y()<<std::endl;
+			//std::cout<<"x:"<<(int)p->get_next_x()/50<<" y:"<<(int)p->get_next_y()/50<<std::endl;
+			//std::cout<<"px:"<<p->get_next_x()<<" py:"<<p->get_next_y()<<std::endl;
 			Map_Matrix[(int)p->get_next_x()/50][(int)p->get_next_y()/50][0]->collision(p);
 		}		
 	}
@@ -51,8 +51,13 @@ void Map::collision(Player *p){
 }
 
 void Map::collision(Projectile *p){
-	if(p->get_next_x()>0&&p->get_next_x()<x*50+50&&p->get_next_y()>0&&p->get_next_y()<y*50+50)
-	Map_Matrix[p->get_next_x()/50][p->get_next_x()/50][0]->collision(p);
+	if(p->get_x()>0&&p->get_x()<x*50+50&&p->get_y()>0&&p->get_y()<y*50+50){
+		if(Map_Matrix[(int)p->get_x()/50][(int)p->get_y()/50][0]!=NULL){
+			//std::cout<<"x:"<<(int)p->get_next_x()/50<<" y:"<<(int)p->get_next_y()/50<<std::endl;
+			//std::cout<<"px:"<<p->get_next_x()<<" py:"<<p->get_next_y()<<std::endl;
+			Map_Matrix[(int)p->get_x()/50][(int)p->get_y()/50][0]->collision(p);
+		}		
+	}
 }
 
 void Map::action(Player *p){

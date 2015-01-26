@@ -24,13 +24,14 @@ class Game{
 
 		void collisions(Player* p);
 		void add_projectile(Projectile* p);
-
+		void remove_projectile(Projectile* p);
 
 	private:
 		Lobby* lobby;
 		Map *map;
 		std::set<Player*> Players;
 		std::list<Projectile*> Projectiles;
+		std::list<Projectile*> Projectiles_queue;
 		ALLEGRO_EVENT_QUEUE *event_queue;
 		ALLEGRO_TIMER *timer;
 		void update();

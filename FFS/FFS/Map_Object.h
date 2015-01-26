@@ -18,6 +18,7 @@ public:
 	void add_player(Player *p);
 	int get_id();
 	std::pair <int,int> get_xy();
+	std::set<Player *> get_players();
 protected:
 	std::set<Player *> Players;
 	Game *game;

@@ -96,8 +96,8 @@ using namespace std;
 				return ;
 			}
 
-			for(int i=0;i<2;i++){
-				
+			for(int i=0;i<10;i++){
+				cout<<"game start in:"<<10-i<<endl;
 				boost::this_thread::sleep(boost::posix_time::milliseconds(1000));
 			}
 			
@@ -192,47 +192,29 @@ using namespace std;
 				
 				map->collision(*it);
 			}
-			for(list<Projectile*>::iterator it=Projectiles.begin(); it!=Projectiles.end() ; it++){
+			while(!Projectiles_queue.empty()){
+				Projectiles.push_back(Projectiles_queue.front());	
+				Projectiles_queue.pop_front();
+			}
+			int list_size=Projectiles.size(),i=0;
+
+			for(list<Projectile*>::iterator it=Projectiles.begin(); it!=Projectiles.end() ;i++){
+				map->collision((*it));
+				
+				if(list_size!=Projectiles.size()){
+					list_size=Projectiles.size();
+					it=Projectiles.begin();
+				}else {
+					it++;
+					
+				}
+
+
 				
 			}
 		}
-float iloczyn(float x1, float y1, float x2,float y2, float x3, float y3) { 
-			return (x2 - x1)*(y3 - y1) - (x3 - x1)*(y2 - y1);    //zwracamy iloczyn skalarny wektorów (p2-p1) i (p3-p1)
-		}
-		void Game::collisions(Player* p){
-			float x=p->get_next_x();
-			float y=p->get_next_y();
-			if(x<0||x>640){
-				p->instant_stop_x();
-				if(x<0)
-					p->move_to(0,p->get_y());
-				if(x>640)
-					p->move_to(640,p->get_y());
-				send("player,"+p->get_id()+",instant_stop_x,"+p->get_string_x()+","+p->get_string_y());
-			}
-			if(y<0||y>480){
-				p->instant_stop_y();
-				if(y<0)
-					p->move_to(p->get_x(),0);
-				if(y>480)
-					p->move_to(p->get_x(),480);
-				send("player,"+p->get_id()+",instant_stop_y,"+p->get_string_x()+","+p->get_string_y());
-			}
-
-			for(list<Projectile*>::iterator it=Projectiles.begin(); it!=Projectiles.end(); it++){
-				float S_1 = iloczyn((*it)->get_x(),(*it)->get_y(), p->get_x(), p->get_y() , (*it)->get_next_x(),(*it)->get_next_y());
-				float S_2 = iloczyn((*it)->get_x(),(*it)->get_y(), p->get_x(), p->get_y()+75, (*it)->get_next_x(),(*it)->get_next_y());
-				float S_3 = iloczyn(p->get_x(), p->get_y() , (*it)->get_x(),(*it)->get_y(), p->get_x(), p->get_y()+75);
-				float S_4 = iloczyn(p->get_x(), p->get_y() , (*it)->get_x(),p->get_y()+75, p->get_x(), p->get_y()+75);
-				if (((S_1 > 0 && S_2 < 0) || (S_1 < 0 && S_2 > 0)) && ((S_3 < 0 && S_4 > 0) || (S_3 > 0 && S_4 < 0))){
-					send("player,"+p->get_id()+",hp,"+to_string((*it)->get_dmg(1)));
-				}
-			}
 
 
-
-
-		}
 
 		
 
@@ -245,7 +227,25 @@ float iloczyn(float x1, float y1, float x2,float y2, float x3, float y3) {
 
 		void Game::add_projectile(Projectile *p){
 			p->set_id(projectile_id++);
-			Projectiles.push_back(p);
+			Projectiles_queue.push_back(p);
 
 			send("game,add_projectile,"+to_string(p->get_id())+","+p->get_string_x()+","+p->get_string_y()+","+to_string(p->get_alpha())+","+to_string(p->get_team()));
+		}
+
+		void Game::remove_projectile(Projectile* p){
+			int i=0;
+			for (list<Projectile *>::iterator it=Projectiles.begin(); it!=Projectiles.end(); ++it,i++){
+				if((*it)->get_id()==p->get_id()){
+					this->send("game,remove_projectile,"+to_string(p->get_id()));
+					Projectiles.erase(it);
+					cout<<"break"<<endl;
+					break;
+				}
+
+
+			}
+			delete p;
+
+			
+			
 		}

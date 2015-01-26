@@ -79,6 +79,7 @@ void Solid_Block::collision(Player *p){
 			p->move_to(new_x,new_y);
 			p->instant_stop_y();
 			game->send("player,"+p->get_id()+",instant_stop_y,"+p->get_string_x()+","+p->get_string_y());
+
 		}
 	}
 
@@ -123,13 +124,7 @@ void Solid_Block::collision(Player *p){
 }
 
 void Solid_Block::collision(Projectile *p){
-	for(std::set<Player *>::iterator it=Players.begin();it!=Players.end();it++){
-		if((*it)->get_x()-p->get_x()>-25 && (*it)->get_x()-p->get_x()<25 && (*it)->get_y()-p->get_y()>0 && (*it)->get_y()-p->get_y()<100){
-
-		}
-
-	}
-
+		game->remove_projectile(p);
 }
 
 void Solid_Block::action(Player *p){
