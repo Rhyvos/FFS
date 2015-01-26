@@ -4,6 +4,7 @@
 
 
 #include "Movement.hpp"	
+#include "Weapon.h"
 class Lobby;
 class Game;
 class Player : public Movement{
@@ -24,11 +25,22 @@ class Player : public Movement{
 		void end_game();
 		void login(std::string name, std::string pw);
 		std::string get_id();
+		int get_team();
+		void add_weapon(Weapon *w);
+		void swap_weapon(int i);
+		void shoot(float alpha);
+		void change_weapon(Weapon *w);
+		void add_ammo(int ammo);
+
+
+
 	private:
 		int team;
 		int id;
 		boost::shared_ptr<boost::asio::ip::tcp::socket> socket;
 		std::string name;
+		std::list<Weapon *> Weapons;
+		std::list<Weapon *>::iterator actual_weapon;
 		Lobby *lobby;
 		Game *game;
 		boost::mutex mtx_;

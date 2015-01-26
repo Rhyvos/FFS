@@ -4,8 +4,8 @@
 #define PI 3.14159265
 
 
-Bullet::Bullet(float x, float y, float alfa, int team):
-	Projectile(20,1000), speed(150)
+Bullet::Bullet(float alfa, float x, float y, int team ):
+	Projectile(20,1000), speed(600)
 {
 	this->move_to(x,y);
 	this->vx=cos(alfa*PI/180)*speed;

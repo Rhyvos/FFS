@@ -1,13 +1,21 @@
 #include "Player.h"
-
+#include "Game.hpp"
+#include "Projectile.h"
 using namespace std;
 
-Player::Player(std::string name, int id) : Movement(60)
+Player::Player(std::string name, int id, Game *g) : Movement(60)
 {
+	this->game=g;
 	this->name=name;
 	this->id=id;
 	cout<<"New Player: "<<name<<" id:"<<id<<endl;
 }
+
+Player::~Player(){
+	al_destroy_bitmap(model);
+	al_destroy_bitmap(weapon);
+}
+
 
 void Player::read_msg(std::vector<std::string> msg){
 
@@ -22,7 +30,7 @@ void Player::read_msg(std::vector<std::string> msg){
 		move_to(stof(msg[4]),stof(msg[5]));
 		stop_move();
 	}else if(!msg[2].compare("shoot")){
-		shoot();
+		shoot(0.0);
 	}else if(!msg[2].compare("swap_weapon")){
 		cout<<name<<" swap weapon"<<endl;
 	}else if(!msg[2].compare("action")){
@@ -41,6 +49,9 @@ void Player::read_msg(std::vector<std::string> msg){
 
 	}else if(!msg[2].compare("hp")){
 		hp=stof(msg[3]);
+	}else if(!msg[2].compare("fall")){
+		move_to(stof(msg[3]),stof(msg[4]));
+		fall();
 	}
 
 
@@ -54,8 +65,13 @@ int Player::get_id(){
 	return id;
 }
 
+void Player::update(){
+	Movement::update();
+	al_draw_filled_circle(x,450-y, 5, al_map_rgb(255,0,0));
+}
 
 
-void Player::shoot(){
-	cout<<"shoot"<<endl;
+
+void Player::shoot(float alpha){
+	
 }

@@ -1,6 +1,7 @@
 #include "Player.hpp"
 #include "Lobby.hpp"
 #include "Bullet.hpp"
+#include "Gun.h"
 
 using namespace std;
 
@@ -14,6 +15,9 @@ using namespace std;
 		game=NULL;
 		logged=false;
 		this->id=id;
+		add_weapon(new Gun());
+		actual_weapon=Weapons.begin();
+
 	}
 	Player::~Player(){
 		if(game!=NULL)
@@ -129,17 +133,25 @@ using namespace std;
 			boost::thread t(boost::bind(&Movement::stop_move,this));
 			game->send("player,"+to_string(id)+","+split_msg[0]+","+split_msg[1]+","+this->get_string_x()+","+this->get_string_y());
 		}
-		else if(!split_msg[0].compare("shoot")){			/*       No Scripted       */
-			game->add_projectile(new Bullet(this->get_x(), this->get_y(),stof(split_msg[1]), this->team ));
+		else if(!split_msg[0].compare("shoot")){
+			shoot(stof(split_msg[1]));
 			game->send("player,"+to_string(id)+",shoot,"+this->get_string_x()+","+this->get_string_y()+","+split_msg[1]);
 		}
-		else if(!split_msg[0].compare("swap_weapon")){		/*       No Scripted       */
-			cout<<"["<<name<<"] action"<<endl;
+		else if(!split_msg[0].compare("swap_weapon")){
+			swap_weapon(stoi(split_msg[1]));
+			game->send("player,"+to_string(id)+",swap_weapon,"+split_msg[1]);
 		}
 		else if(!split_msg[0].compare("action")){			/*       No Scripted       */
 			cout<<"["<<name<<"] action"<<endl;
 		}
-		else{
+		else if(!split_msg[0].compare("leave_game")){
+			if(game!=NULL){
+				game->remove_player(this);
+				game=NULL;
+			}	
+			else
+				send("error,no game");
+		}else{
 			lobby->send("["+get_name()+"] "+ str);	
 		}
 	}
@@ -199,9 +211,53 @@ using namespace std;
 		this->name.erase();
 		this->name.insert(0,name,0,name.size());
 		this->logged=true;
-		
+		this->send("game,your_id,"+to_string(id));
 	}
 
 	string Player::get_id(){
 		return to_string(id);
+	}
+
+	int Player::get_team(){
+		return team;
+	}
+
+
+	void Player::add_weapon(Weapon *w){
+		if(Weapons.size()<4)
+			Weapons.push_back(w);
+	}
+
+	void Player::swap_weapon(int i){
+		if(i<Weapons.size()){
+			actual_weapon=Weapons.begin();
+			advance(actual_weapon,i);
+		}
+		else
+			cout<<"change weapon over array"<<endl;
+	}
+
+	void Player::shoot(float alpha){
+		if((*actual_weapon)->is_ready()){
+			Projectile *p=(*actual_weapon)->shoot(alpha,this->get_x(), this->get_y(), this->team );
+			if(p!=NULL){
+				p->set_alpha(alpha);
+				game->add_projectile(p);
+			}	
+			else
+				cout<<"can't shoot"<<endl;
+		}
+		else
+			cout<<"weapon not ready"<<endl;
+	}
+
+	void Player::change_weapon(Weapon *w){
+		Weapons.erase(actual_weapon);
+		Weapons.insert(actual_weapon,w);
+		
+
+	}
+
+	void Player::add_ammo(int ammo){
+		(*actual_weapon)->add_ammo(ammo);
 	}

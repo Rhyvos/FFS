@@ -7,6 +7,7 @@ class Socket_session{
 
 public:
 	Socket_session(std::string ip,std::string port);
+	~Socket_session();
 	void read();
 	void handle_read(char *msg,std::size_t bytes_transferred);
 	void write(std::string msg);
@@ -16,6 +17,7 @@ public:
 	void map(std::vector<std::string> msg);
 	boost::mutex mtx_;
 private:
+	int player_id;
 	Game *game;
 	boost::asio::io_service* io_service;
 	boost::asio::ip::tcp::socket* socket;
