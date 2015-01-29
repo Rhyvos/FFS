@@ -18,7 +18,7 @@ int main(){
 
 
 
-	s=new Socket_session("127.0.0.1","4444");
+	s=new Socket_session("169.254.29.91","4444");
 	boost::thread t(boost::bind(&Socket_session::read,s));
 	
 	std::string x;
@@ -26,7 +26,7 @@ int main(){
 	std::cin>>x;
 	s->write("login,"+x+",1234");
 	boost::this_thread::sleep(boost::posix_time::milliseconds(1000));
-	s->write("create_game,Game1,1,2");
+	s->write("create_game,Game1,2,2");
 	boost::this_thread::sleep(boost::posix_time::milliseconds(1000));
 	s->write("join_game,Game1");
 	while(true){
