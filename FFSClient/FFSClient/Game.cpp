@@ -149,8 +149,8 @@ void Game::start(){
          }
 	  }else if(ev.type == ALLEGRO_EVENT_MOUSE_BUTTON_DOWN){
 		  if(ev.mouse.button==1&&client_player!=NULL){
-				int x=(float)ev.mouse.x-client_player->get_x();
-				int y=(float)(350-ev.mouse.y)-client_player->get_y();
+				int x=(float)(ev.mouse.x+client_player->get_x()-320)-client_player->get_x();
+				int y=(float)(client_player->map_xy.second*50-client_player->get_y()-35)-(ev.mouse.y+165-client_player->get_y());
 				float alpha=atan2 (y,x) * 180 / PI;
 				session->write("shoot,"+to_string(alpha));
 		  }
@@ -212,15 +212,17 @@ void Game::draw_players(){
 		const char *cstr = str.c_str();
 		int x=(*it)->get_x();
 		int y=(*it)->get_y();
-		int vx=(*it)->get_vx();
+		/*int vx=(*it)->get_vx();
 		int vy=(*it)->get_vy();
-		std::string str1= "x:"+to_string(x)+" vx:"+to_string(vx);
+		
 		std::string str2= "y:"+to_string(y)+" vy:"+to_string(vy);
+		const char *cstr2 = str2.c_str();*/
+		std::string str1= "HP="+to_string((*it)->hp);
 		const char *cstr1 = str1.c_str();
-		const char *cstr2 = str2.c_str();
+		
 		al_draw_text(font, al_map_rgb(0,0,0),x, 415-y,ALLEGRO_ALIGN_CENTRE, cstr);
 		al_draw_text(font, al_map_rgb(0,0,0),x, 425-y,ALLEGRO_ALIGN_CENTRE, cstr1);
-		al_draw_text(font, al_map_rgb(0,0,0),x, 435-y,ALLEGRO_ALIGN_CENTRE, cstr2);
+		//al_draw_text(font, al_map_rgb(0,0,0),x, 435-y,ALLEGRO_ALIGN_CENTRE, cstr2);
 
 	
 	}

@@ -213,15 +213,15 @@ using namespace std;
 			for(list<Projectile*>::iterator it=Projectiles.begin(); it!=Projectiles.end() ;i++){
 				for(set<Player*>::iterator it1=Players.begin(); it1!=Players.end() ; it1++){
 					if((*it)->get_x()>(*it1)->get_x()-25&&(*it)->get_x()<(*it1)->get_x()+25){
-						if((*it)->get_y()>(*it1)->get_y()&&(*it)->get_y()<(*it1)->get_y()+75&&(*it)->get_team()!=(*it1)->get_team()){
+						if((*it)->get_y()>(*it1)->get_y()&&(*it)->get_y()<(*it1)->get_y()+75&&(*it)->get_team()!=(*it1)->get_team()&&(*it1)->dead==false){
 							(*it1)->hp=(*it1)->hp-20;																					// DMg Broni jest sta³e
 							this->send("player,"+(*it1)->get_id()+",hp,"+to_string((*it1)->hp));
 							remove_projectile(*it);
-							cout<<"player,"+(*it1)->get_id()+",hp,"+to_string((*it1)->hp)<<endl;
 							if((*it1)->hp<=0){
 								Player *p=(*it1);
 								boost::thread t(boost::bind(&Player::respawn,p,10));
 							}
+							break;
 
 						}
 
@@ -259,7 +259,7 @@ using namespace std;
 			p->set_id(projectile_id++);
 			Projectiles_queue.push_back(p);
 
-			send("game,add_projectile,"+to_string(p->get_id())+","+p->get_string_x()+","+p->get_string_y()+","+to_string(p->get_alpha())+","+to_string(p->get_team()));
+			send("game,add_projectile,"+to_string(p->get_id())+","+p->get_string_x()+","+to_string(p->get_y())+","+to_string(p->get_alpha())+","+to_string(p->get_team()));
 		}
 
 		void Game::remove_projectile(Projectile* p){

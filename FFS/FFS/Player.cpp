@@ -140,7 +140,7 @@ using namespace std;
 		}
 		else if(!split_msg[0].compare("shoot")){
 			boost::thread t(boost::bind(&Player::shoot,this,stof(split_msg[1])));
-			game->send("player,"+to_string(id)+",shoot,"+this->get_string_x()+","+this->get_string_y()+","+split_msg[1]);
+			game->send("player,"+to_string(id)+",shoot,"+this->get_string_x()+","+to_string(this->get_y()+35)+","+split_msg[1]);
 		}
 		else if(!split_msg[0].compare("swap_weapon")){
 			swap_weapon(stoi(split_msg[1]));
@@ -243,7 +243,7 @@ using namespace std;
 
 	void Player::shoot(float alpha){
 		if((*actual_weapon)->is_ready()){
-			Projectile *p=(*actual_weapon)->shoot(alpha,this->get_x(), this->get_y(), this->team );
+			Projectile *p=(*actual_weapon)->shoot(alpha,this->get_x(), this->get_y()+35, this->team );
 			if(p!=NULL){
 				p->set_alpha(alpha);
 				game->add_projectile(p);

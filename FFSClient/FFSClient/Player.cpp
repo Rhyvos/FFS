@@ -66,7 +66,10 @@ int Player::get_id(){
 
 void Player::update(){
 	Movement::update();
-	al_draw_filled_rectangle(x-25,map_xy.second*50-y, x+25,map_xy.second*50-75-y, al_map_rgb(255-hp,0,0));
+	if(hp!=0)
+		al_draw_filled_rectangle(x-25,map_xy.second*50-y, x+25,map_xy.second*50-75-y, al_map_rgb(100-hp,hp,0));
+	else
+		al_draw_rectangle(x-25,map_xy.second*50-y, x+25,map_xy.second*50-75-y, al_map_rgb(0,0,0),2);
 }
 
 
