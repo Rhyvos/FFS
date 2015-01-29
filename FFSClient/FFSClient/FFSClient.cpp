@@ -22,11 +22,13 @@ int main(){
 	boost::thread t(boost::bind(&Socket_session::read,s));
 	
 	std::string x;
-	s->write("login,Gracz1,1234");
+	std::cout<<"Podaj nazwe gracza:"<<std::endl;
+	std::cin>>x;
+	s->write("login,"+x+",1234");
 	boost::this_thread::sleep(boost::posix_time::milliseconds(1000));
-	s->write("create_game,a,1,2");
+	s->write("create_game,Game1,1,2");
 	boost::this_thread::sleep(boost::posix_time::milliseconds(1000));
-	s->write("join_game,a");
+	s->write("join_game,Game1");
 	while(true){
 		std::cin>>x;
 		s->write(x);

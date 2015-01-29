@@ -31,12 +31,14 @@ class Player : public Movement{
 		void shoot(float alpha);
 		void change_weapon(Weapon *w);
 		void add_ammo(int ammo);
-
-
+		void respawn(int time);
+		int hp;
+		bool dead;
 
 	private:
 		int team;
 		int id;
+		
 		boost::shared_ptr<boost::asio::ip::tcp::socket> socket;
 		std::string name;
 		std::list<Weapon *> Weapons;

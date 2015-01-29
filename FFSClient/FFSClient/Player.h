@@ -13,13 +13,16 @@ public:
 	int get_id();
 	void read_msg(std::vector<std::string> msg);
 	void update();
+	std::pair <int,int> map_xy;
+	int hp;
 private:
 	Game * game;
 	std::string name;
 	int id;
 	int team;
 	int actual_weapon;
-	int hp;
+	
+	
 	ALLEGRO_BITMAP *model;
 	ALLEGRO_BITMAP *weapon;
 };

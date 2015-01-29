@@ -1,15 +1,14 @@
 #include "Game.hpp"
 #include "Socket_session.h"
-
+#include "Map.h"
 #define PI 3.14159265
 const float FPS = 60;
 
 using namespace std;
 
 Game::Game(Socket_session *session) : 
-	session(session), display(NULL),event_queue(NULL),timer(NULL)
+	session(session), display(NULL),event_queue(NULL),timer(NULL),map(NULL)
 {
-	cout<<"New game"<<endl;
 	stop=false;
 	client_player=NULL;
 }
@@ -100,6 +99,7 @@ void Game::start(){
       al_destroy_timer(timer);
       return ;
    }
+   al_init_image_addon();
    al_init_primitives_addon();
    al_install_keyboard();
 	al_install_mouse();
@@ -109,7 +109,11 @@ void Game::start(){
 	al_register_event_source(event_queue,al_get_keyboard_event_source());
 	al_start_timer(timer);
 	ALLEGRO_EVENT ev;
-	create_map("Map1.txt");
+	map=new Map("Map1.txt");
+	al_set_target_bitmap(al_get_backbuffer(display));
+	for(set<Player*>::iterator it=Players.begin(); it!=Players.end() ; it++){
+		(*it)->map_xy=map->get_xy();
+	}
 	while(!stop)
    {
 
@@ -145,8 +149,8 @@ void Game::start(){
          }
 	  }else if(ev.type == ALLEGRO_EVENT_MOUSE_BUTTON_DOWN){
 		  if(ev.mouse.button==1&&client_player!=NULL){
-				int x=(float)ev.mouse.x-client_player->get_x();
-				int y=(float)(450-ev.mouse.y)-client_player->get_y();
+				int x=(float)(ev.mouse.x+client_player->get_x()-320)-client_player->get_x();
+				int y=(float)(client_player->map_xy.second*50-client_player->get_y()-35)-(ev.mouse.y+165-client_player->get_y());
 				float alpha=atan2 (y,x) * 180 / PI;
 				session->write("shoot,"+to_string(alpha));
 		  }
@@ -158,7 +162,7 @@ void Game::start(){
 		 al_clear_to_color(al_map_rgb(255,255,255));
          redraw = false;
 		 int j=0,i=0;
-		 for (std::vector<std::vector<std::vector<int>>>::iterator it = Map_Matrix.begin(); it != Map_Matrix.end(); ++it, j++){
+		 /*for (std::vector<std::vector<std::vector<int>>>::iterator it = Map_Matrix.begin(); it != Map_Matrix.end(); ++it, j++){
 			 for(std::vector<std::vector<int>>::iterator it1 = (*it).begin(); it1 != (*it).end(); ++it1, i++){
 				 if((*it1)[0]==1){
 					 al_draw_filled_rectangle(j*50,400-(i*50),j*50+50,400-(i*50)+50,al_map_rgb(0,0,0));
@@ -167,21 +171,20 @@ void Game::start(){
 				 
 			 }
 			i=0;
-		 }
-
-		 for(int i=50;i<=600;i+=50){
-			 al_draw_line( i, 0, i, 480, al_map_rgb(128,128,0),1); 
-		 }
-		 for(int i=50;i<=450;i+=50){
-			 al_draw_line( 0, i, 640, i, al_map_rgb(128,128,0),1); 
-		 }
+		 }*/
+		 ALLEGRO_BITMAP * tmp=al_create_bitmap(map->get_xy().first*50,map->get_xy().second*50);
+		 al_set_target_bitmap(tmp);
+		 al_draw_bitmap(map->get_map(),0,0,0);
 		 update_players();
 		 update_projectiles();
-		 draw_players();
-		 
-         //al_draw_bitmap(map, 640, 480, 0);
 
+		 draw_players();
+		 al_set_target_bitmap(al_get_backbuffer(display));
+		 al_draw_bitmap_region(tmp,client_player->get_x()-320,165-client_player->get_y(),640,480,0,0,0);
+         //al_draw_bitmap(map, 640, 480, 0);
+		 
          al_flip_display();
+		 al_destroy_bitmap(tmp);
 
       }
    }
@@ -209,15 +212,17 @@ void Game::draw_players(){
 		const char *cstr = str.c_str();
 		int x=(*it)->get_x();
 		int y=(*it)->get_y();
-		int vx=(*it)->get_vx();
+		/*int vx=(*it)->get_vx();
 		int vy=(*it)->get_vy();
-		std::string str1= "x:"+to_string(x)+" vx:"+to_string(vx);
+		
 		std::string str2= "y:"+to_string(y)+" vy:"+to_string(vy);
+		const char *cstr2 = str2.c_str();*/
+		std::string str1= "HP="+to_string((*it)->hp);
 		const char *cstr1 = str1.c_str();
-		const char *cstr2 = str2.c_str();
+		
 		al_draw_text(font, al_map_rgb(0,0,0),x, 415-y,ALLEGRO_ALIGN_CENTRE, cstr);
 		al_draw_text(font, al_map_rgb(0,0,0),x, 425-y,ALLEGRO_ALIGN_CENTRE, cstr1);
-		al_draw_text(font, al_map_rgb(0,0,0),x, 435-y,ALLEGRO_ALIGN_CENTRE, cstr2);
+		//al_draw_text(font, al_map_rgb(0,0,0),x, 435-y,ALLEGRO_ALIGN_CENTRE, cstr2);
 
 	
 	}
@@ -226,12 +231,12 @@ void Game::draw_players(){
 
 void Game::add_projectile(Projectile *p){
 	Projectiles.push_back(p);
+	p->map_xy=map->get_xy();
 }
 
 void Game::remove_projectile(int id){
 	for(list<Projectile*>::iterator it=Projectiles.begin() ; it!=Projectiles.end(); it++){
 		if(id==(*it)->get_id()){
-			std::cout<<"remove projectile:"<<(*it)->get_id()<<endl;
 			delete (*it);
 			Projectiles.erase(it);
 			return;
@@ -247,62 +252,3 @@ void Game::update_projectiles(){
 
 }
 
-void Game::create_map(std::string name){
-
-
-	map = al_create_bitmap(640,480);
-   if(!map) {
-      fprintf(stderr, "failed to create map!\n");
-      al_destroy_display(display);
-      al_destroy_timer(timer);
-      return;
-   }
- al_draw_filled_rectangle(0,450,600,400,al_map_rgb(0,0,0));
-   al_set_target_bitmap(map);
- 
-   al_clear_to_color(al_map_rgb(0,0,128));
- 
-	
-
-	std::ifstream input (name, std::ifstream::in);
-	char x[1024];
-	int i=0,j=0;
-	int map_x,map_y;
-	input.getline(x,1024);
-	std::stringstream buffer(x);
-	buffer.getline(x,256,'\t');
-	map_x=std::stoi(x);
-	buffer.getline(x,256,'\t');
-	map_y=std::stoi(x);
-
-	std::cout<<"Building Map: "<<name<<std::endl;
-	std::vector<std::vector<std::vector<int>>> Map_Matrix1(map_x,std::vector<std::vector<int>>(map_y,std::vector<int>(10)));
-	Map_Matrix=Map_Matrix1;
-	while(!input.eof()){
-		input.getline(x,1024);
-		std::stringstream buffer(x);
-		while(!buffer.eof()){
-			buffer.getline(x,1024,'\t');
-			std::string s(x);
-			std::cout<<s;
-			if(s.compare("0")==0){
-				Map_Matrix[j][i][0]=0;
-				al_draw_filled_rectangle(j*50,450-(i*50),j*50+50,450-(i*50)+50,al_map_rgb(255,255,255));
-			}
-			else if(s.compare("1")==0){
-				Map_Matrix[j][i][0]=1;
-				al_draw_filled_rectangle(j*50,450-(i*50),j*50+50,450-(i*50)+50,al_map_rgb(0,0,0));
-			}
-
-
-				
-			j++;
-		}
-		std::cout<<std::endl;
-		i++;
-		j=0;
-	}
-
-	al_set_target_bitmap(al_get_backbuffer(display));
-
-}

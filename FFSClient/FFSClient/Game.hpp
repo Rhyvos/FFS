@@ -3,7 +3,7 @@
 
 #include "Player.h"
 #include "Projectile.h"
-
+#include "Map.h"
 
 class Socket_session;
 
@@ -36,9 +36,9 @@ private:
 	ALLEGRO_EVENT_QUEUE *event_queue;
 	ALLEGRO_TIMER *timer;
 	ALLEGRO_FONT *font;
-	ALLEGRO_BITMAP *map;
 	bool redraw;
 	bool stop;
+	Map *map;
 };
 
 

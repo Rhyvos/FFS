@@ -13,7 +13,6 @@ Map::Map(std::string name, Game*g){
 	buffer.getline(x,256,'\t');
 	this->y=std::stoi(x);
 
-	std::cout<<"Building Map: "<<name<<std::endl;
 	std::vector<std::vector<std::vector<Map_Object*>>> Map_Matrix1(this->x,std::vector<std::vector<Map_Object*>>(this->y,std::vector<Map_Object*>(10)));
 	Map_Matrix=Map_Matrix1;
 	while(!input.eof()){
@@ -22,7 +21,6 @@ Map::Map(std::string name, Game*g){
 		while(!buffer.eof()){
 			buffer.getline(x,1024,'\t');
 			std::string s(x);
-			std::cout<<s;
 			if(s.compare("0")==0)
 				Map_Matrix[j][i][0]=mof.Free(j,i);
 			else if(s.compare("1")==0)

@@ -6,8 +6,10 @@ public:
 	Projectile(int id,float x,float y,float alpha);
 	void update();
 	int get_id();
+	std::pair <int,int> map_xy;
 private:
 	int id;
+	
 };
 
 
