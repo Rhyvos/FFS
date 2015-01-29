@@ -15,6 +15,8 @@ using namespace std;
 		game=NULL;
 		logged=false;
 		this->id=id;
+		hp=100;
+		dead=false;
 		add_weapon(new Gun());
 		actual_weapon=Weapons.begin();
 
@@ -42,7 +44,7 @@ using namespace std;
 				else 
 					boost::thread t(boost::bind(&Player::handle_game_recive,this,msg,length));
 
-
+			boost::this_thread::sleep(boost::posix_time::milliseconds(1));
 			} 
 		}
 		catch(std::exception &ec){
@@ -56,7 +58,6 @@ using namespace std;
 		std::string str(msg,bytes_transferred);
 		std::vector<std::string> split_msg=split(str,",");
 		str=str.substr(0,str.size()-1);
-		cout<<str<<endl;
 		if(!logged){
 			if(!split_msg[0].compare("login"))
 				login(split_msg[1],split_msg[2]);
@@ -115,7 +116,11 @@ using namespace std;
 		std::string str(msg,bytes_transferred);
 		std::vector<std::string> split_msg=split(str,",");
 		str=str.substr(0,str.size()-1);
-		cout<<str<<endl;
+		if(dead){
+			send("error,you are dead");
+			return;
+		}
+
 
 		if(!split_msg[0].compare("disconnect")){
 			lobby->remove_player(this);
@@ -125,7 +130,7 @@ using namespace std;
 			game->send("player,"+to_string(id)+","+split_msg[0]+","+split_msg[1]+","+this->get_string_x()+","+this->get_string_y());
 		}
 		else if(!split_msg[0].compare("jump")){
-			cout<<"jump"<<endl;
+
 			boost::thread t(boost::bind(&Movement::jump,this,stof(split_msg[1])));
 			game->send("player,"+to_string(id)+","+split_msg[0]+","+split_msg[1]+","+this->get_string_x()+","+this->get_string_y());
 		}
@@ -134,7 +139,7 @@ using namespace std;
 			game->send("player,"+to_string(id)+","+split_msg[0]+","+split_msg[1]+","+this->get_string_x()+","+this->get_string_y());
 		}
 		else if(!split_msg[0].compare("shoot")){
-			shoot(stof(split_msg[1]));
+			boost::thread t(boost::bind(&Player::shoot,this,stof(split_msg[1])));
 			game->send("player,"+to_string(id)+",shoot,"+this->get_string_x()+","+this->get_string_y()+","+split_msg[1]);
 		}
 		else if(!split_msg[0].compare("swap_weapon")){
@@ -161,7 +166,6 @@ using namespace std;
 
 	void Player::send(std::string str){
 		mtx_.lock();
-		cout<<str<<endl;
 		try{
 			socket->send(boost::asio::buffer(str+"\n"));
 		}
@@ -170,7 +174,7 @@ using namespace std;
 				boost::this_thread::sleep(boost::posix_time::milliseconds(300));
 				lobby->remove_player(this);
 		}
-		boost::this_thread::sleep(boost::posix_time::milliseconds(1));
+		boost::this_thread::sleep(boost::posix_time::milliseconds(10));
 		mtx_.unlock();
 	}
 
@@ -260,4 +264,14 @@ using namespace std;
 
 	void Player::add_ammo(int ammo){
 		(*actual_weapon)->add_ammo(ammo);
+	}
+
+	void Player::respawn(int time){
+		dead=true;
+		boost::this_thread::sleep(boost::posix_time::seconds(time));
+		this->move_to(150,150);
+		hp=100;
+		game->send("player,"+get_id()+",hp,"+to_string(hp));
+		game->send("player,"+get_id()+",move_to,"+get_string_x()+","+get_string_y());
+		dead=false;
 	}

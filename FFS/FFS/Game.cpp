@@ -96,8 +96,7 @@ using namespace std;
 				return ;
 			}
 
-			for(int i=0;i<10;i++){
-				cout<<"game start in:"<<10-i<<endl;
+			for(int i=0;i<5;i++){
 				boost::this_thread::sleep(boost::posix_time::milliseconds(1000));
 			}
 			
@@ -171,8 +170,10 @@ using namespace std;
 					(*it)->in_game=true;
 					(*it)->set_team(j);
 					(*it)->reset();
+					(*it)->hp=100;
 					(*it)->move_to(150,150);
 					send("player,"+(*it)->get_id()+",team,"+to_string(j));
+					this->send("player,"+(*it)->get_id()+",hp,"+to_string((*it)->hp));
 					this->send("player,"+(*it)->get_id()+",move_to,"+(*it)->get_string_x()+","+(*it)->get_string_y());
 					
 				}
@@ -207,7 +208,36 @@ using namespace std;
 				}else {
 					it++;
 					
+			}
+			int list_size=Projectiles.size(),i=0;
+			for(list<Projectile*>::iterator it=Projectiles.begin(); it!=Projectiles.end() ;i++){
+				for(set<Player*>::iterator it1=Players.begin(); it1!=Players.end() ; it1++){
+					if((*it)->get_x()>(*it1)->get_x()-25&&(*it)->get_x()<(*it1)->get_x()+25){
+						if((*it)->get_y()>(*it1)->get_y()&&(*it)->get_y()<(*it1)->get_y()+75&&(*it)->get_team()!=(*it1)->get_team()){
+							(*it1)->hp=(*it1)->hp-20;																					// DMg Broni jest sta³e
+							this->send("player,"+(*it1)->get_id()+",hp,"+to_string((*it1)->hp));
+							remove_projectile(*it);
+							cout<<"player,"+(*it1)->get_id()+",hp,"+to_string((*it1)->hp)<<endl;
+							if((*it1)->hp<=0){
+								Player *p=(*it1);
+								boost::thread t(boost::bind(&Player::respawn,p,10));
+							}
+
+						}
+
+					}
 				}
+				if(list_size!=Projectiles.size()){
+					list_size=Projectiles.size();
+					it=Projectiles.begin();
+				}else {
+					it++;
+			}
+				
+				
+				
+					
+			}
 
 
 				
@@ -238,7 +268,6 @@ using namespace std;
 				if((*it)->get_id()==p->get_id()){
 					this->send("game,remove_projectile,"+to_string(p->get_id()));
 					Projectiles.erase(it);
-					cout<<"break"<<endl;
 					break;
 				}
 

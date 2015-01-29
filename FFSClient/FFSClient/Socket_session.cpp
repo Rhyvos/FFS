@@ -72,7 +72,6 @@ void Socket_session::handle_read(char *msg,std::size_t bytes_transferred){
 	std::string str(msg,bytes_transferred);
 	std::vector<std::string> split_msg=split(str,",");
 	str=str.substr(0,str.size()-1);
-	cout<<str<<endl;
 	if(!split_msg[0].compare("game")){
 		game_msg(split_msg);
 	}else if(!split_msg[0].compare("player")){
@@ -118,7 +117,7 @@ void Socket_session::game_msg(std::vector<std::string> msg){
 	}else if(!msg[1].compare("remove_projectile")&&game!=NULL){
 		game->remove_projectile(stoi(msg[2]));
 	}else{
-		cout<<msg[0]<<"--"<<msg[1]<<endl;
+		cout<<"no function:"+msg[1]<<endl;
 	}
 
 

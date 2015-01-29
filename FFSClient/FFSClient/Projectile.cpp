@@ -9,6 +9,7 @@ Movement(60)
 	this->vx=cos(alpha*PI/180)*600;
 	this->vy=sin(alpha*PI/180)*600;
 	this->id=id;
+
 }
 
 void Projectile::update(){
@@ -16,7 +17,7 @@ void Projectile::update(){
 		vy+=ay/LOOP_PER_SECOND;
 		x+=vx/LOOP_PER_SECOND;
 		y+=vy/LOOP_PER_SECOND;
-		al_draw_filled_circle(x,450-y, 2, al_map_rgb(0,0,0));
+		al_draw_filled_circle(x,map_xy.second*50-y, 2, al_map_rgb(0,0,0));
 }
 
 int Projectile::get_id(){
